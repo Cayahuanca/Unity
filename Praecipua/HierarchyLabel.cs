@@ -11,9 +11,9 @@ public class HierarchyLabel : MonoBehaviour
     public Color textColor;
     public Color customLabelColor;
     public Color customTextColor;
-    public bool textBold;
-    public bool textItalic;
-    public int textPosition;
+    public bool textBold = true;
+    public bool textItalic = false;
+    public int textPosition = 1;
     public int presetID;
     public int themeID;
     public string HLThemeKey = "Hierarchy_Label_Theme";
@@ -45,15 +45,15 @@ public class HierarchyLabelScriptEditor : Editor
                 EditorGUI.BeginChangeCheck();
                 //HierarchyLabelScript.themeID = EditorGUILayout.IntField("Theme", HierarchyLabelScript.themeID);
         
-                    if (GUILayout.Button("Theme 0"))
+                    if (GUILayout.Button("Default"))
                     {
                         HierarchyLabelScript.themeID = 0;
                     }
-                    if (GUILayout.Button("Theme 1"))
+                    if (GUILayout.Button("Pastel"))
                     {
                         HierarchyLabelScript.themeID = 1;
                     }
-                    if (GUILayout.Button("Theme 2"))
+                    if (GUILayout.Button("CUD"))
                     {
                         HierarchyLabelScript.themeID = 2;
                     }
@@ -76,19 +76,34 @@ public class HierarchyLabelScriptEditor : Editor
         string color6 = "White";
         string color7 = "Gray";
         string color8 = "Black";
-        string color9 = "Custom";
+        string color9 = "None";
 
         if (HierarchyLabelScript.themeID == 1)
         {
-            color0 = "Red1";
-            color1 = "Green1";
-            color2 = "Blue1";
-            color3 = "Yellow1";
-            color4 = "Cyan1";
-            color5 = "Magenta1";
-            color6 = "White1";
-            color7 = "Gray1";
-            color8 = "Black1";
+            color0 = "Yellow";
+            color1 = "Orange";
+            color2 = "Rose";
+            color3 = "Pink";
+            color4 = "Purple";
+            color5 = "Blue";
+            color6 = "Osian";
+            color7 = "Blue";
+            color8 = "Aqua";
+            color9 = "Green";
+        }
+
+        if (HierarchyLabelScript.themeID == 2)
+        {
+            color0 = "White";
+            color1 = "Black";
+            color2 = "Light Gray";
+            color3 = "Dark Gray";
+            color4 = "Red";
+            color5 = "Yellow";
+            color6 = "Green";
+            color7 = "Blue";
+            color8 = "Orange";
+            color9 = "Brown";
         }
 
         EditorGUILayout.BeginVertical();
@@ -113,14 +128,14 @@ public class HierarchyLabelScriptEditor : Editor
                     HierarchyLabelScript.presetID = 3;
                     SetColor(HierarchyLabelScript);
                 }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(color4))
                 {
                     HierarchyLabelScript.presetID = 4;
                     SetColor(HierarchyLabelScript);
                 }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(color5))
                 {
                     HierarchyLabelScript.presetID = 5;
@@ -141,6 +156,11 @@ public class HierarchyLabelScriptEditor : Editor
                     HierarchyLabelScript.presetID = 8;
                     SetColor(HierarchyLabelScript);
                 }
+                if (GUILayout.Button(color9))
+                {
+                    HierarchyLabelScript.presetID = 9;
+                    SetColor(HierarchyLabelScript);
+                }
             EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
 
@@ -155,7 +175,7 @@ public class HierarchyLabelScriptEditor : Editor
         {
             HierarchyLabelScript.customLabelColor.a = 1.0f;
             HierarchyLabelScript.customTextColor.a = 1.0f;
-            HierarchyLabelScript.presetID = 9;
+            HierarchyLabelScript.presetID = 11;
             SetColor(HierarchyLabelScript);
         }
 
@@ -258,6 +278,11 @@ public class HierarchyLabelScriptEditor : Editor
             }
             else if (HierarchyLabelScript.presetID == 9)
             {
+                //HierarchyLabelScript.labelColor = Color.;
+                //HierarchyLabelScript.textColor = Color.;
+            }
+            else if (HierarchyLabelScript.presetID == 11)
+            {
                 HierarchyLabelScript.labelColor = HierarchyLabelScript.customLabelColor;
                 HierarchyLabelScript.textColor = HierarchyLabelScript.customTextColor;
             }
@@ -268,68 +293,139 @@ public class HierarchyLabelScriptEditor : Editor
             }
         }
         // テーマ1
+        //Color Palette from this website. https://coolors.co/palette/fbf8cc-fde4cf-ffcfd2-f1c0e8-cfbaf0-a3c4f3-90dbf4-8eecf5-98f5e1-b9fbc0
         else if (HierarchyLabelScript.themeID == 1)
         {
             if (HierarchyLabelScript.presetID == 0)
             {
-                HierarchyLabelScript.labelColor = Color.red;
+                HierarchyLabelScript.labelColor = new Color(251f / 255f, 248f / 255f, 204f / 255f);
                 HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 1)
             {
-                HierarchyLabelScript.labelColor = Color.green;
-                HierarchyLabelScript.textColor = Color.white;
+                HierarchyLabelScript.labelColor = new Color(253f / 255f, 228f / 255f, 207f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 2)
             {
-                HierarchyLabelScript.labelColor = Color.blue;
+                HierarchyLabelScript.labelColor = new Color(255f / 255f, 207f / 255f, 210f / 255f);
                 HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 3)
             {
-                HierarchyLabelScript.labelColor = Color.yellow;
-                HierarchyLabelScript.textColor = Color.white;
+                HierarchyLabelScript.labelColor = new Color(241f / 255f, 192f / 255f, 232f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 4)
             {
-                HierarchyLabelScript.labelColor = Color.cyan;
-                HierarchyLabelScript.textColor = Color.white;
+                HierarchyLabelScript.labelColor = new Color(207f / 255f, 186f / 255f, 240f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 5)
             {
-                HierarchyLabelScript.labelColor = Color.magenta;
+                HierarchyLabelScript.labelColor = new Color(163f / 255f, 196f / 255f, 243f / 255f);
                 HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 6)
             {
-                HierarchyLabelScript.labelColor = Color.white;
-                HierarchyLabelScript.textColor = Color.red;
+                HierarchyLabelScript.labelColor = new Color(144f / 255f, 219f / 255f, 244f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 7)
             {
-                HierarchyLabelScript.labelColor = Color.gray;
-                HierarchyLabelScript.textColor = Color.white;
+                HierarchyLabelScript.labelColor = new Color(142f / 255f, 236f / 255f, 245f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 8)
             {
-                HierarchyLabelScript.labelColor = Color.black;
-                HierarchyLabelScript.textColor = Color.red;
+                HierarchyLabelScript.labelColor = new Color(152f / 255f, 245f / 255f, 225f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
             }
             else if (HierarchyLabelScript.presetID == 9)
+            {
+                HierarchyLabelScript.labelColor = new Color(185f / 255f, 251f / 255f, 192f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
+            }
+            else if (HierarchyLabelScript.presetID == 11)
             {
                 HierarchyLabelScript.labelColor = HierarchyLabelScript.customLabelColor;
                 HierarchyLabelScript.textColor = HierarchyLabelScript.customTextColor;
             }
             else
             {
-                HierarchyLabelScript.labelColor = Color.black;
+                HierarchyLabelScript.labelColor = Color.white;
+                HierarchyLabelScript.textColor = Color.black;
+            }
+        }
+        // テーマ2
+        //Color Palette from CUD Color GuideBook v4.
+        else if (HierarchyLabelScript.themeID == 2)
+        {
+            if (HierarchyLabelScript.presetID == 0)
+            {
+                HierarchyLabelScript.labelColor = new Color(255f / 255f, 255f / 255f, 255f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
+            }
+            else if (HierarchyLabelScript.presetID == 1)
+            {
+                HierarchyLabelScript.labelColor = new Color(0f / 255f, 0f / 255f, 0f / 255f);
                 HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 2)
+            {
+                HierarchyLabelScript.labelColor = new Color(200f / 255f, 200f / 255f, 203f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
+            }
+            else if (HierarchyLabelScript.presetID == 3)
+            {
+                HierarchyLabelScript.labelColor = new Color(132f / 255f, 145f / 255f, 158f / 255f);
+                HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 4)
+            {
+                HierarchyLabelScript.labelColor = new Color(255f / 255f, 75f / 255f, 0f / 255f);
+                HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 5)
+            {
+                HierarchyLabelScript.labelColor = new Color(255f / 255f, 241f / 255f, 0f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
+            }
+            else if (HierarchyLabelScript.presetID == 6)
+            {
+                HierarchyLabelScript.labelColor = new Color(3f / 255f, 175f / 255f, 122f / 255f);
+                HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 7)
+            {
+                HierarchyLabelScript.labelColor = new Color(0f / 255f, 90f / 255f, 255f / 255f);
+                HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 8)
+            {
+                HierarchyLabelScript.labelColor = new Color(246f / 255f, 170f / 255f, 0f / 255f);
+                HierarchyLabelScript.textColor = Color.black;
+            }
+            else if (HierarchyLabelScript.presetID == 9)
+            {
+                HierarchyLabelScript.labelColor = new Color(128f / 255f, 64f / 255f, 0f / 255f);
+                HierarchyLabelScript.textColor = Color.white;
+            }
+            else if (HierarchyLabelScript.presetID == 11)
+            {
+                HierarchyLabelScript.labelColor = HierarchyLabelScript.customLabelColor;
+                HierarchyLabelScript.textColor = HierarchyLabelScript.customTextColor;
+            }
+            else
+            {
+                HierarchyLabelScript.labelColor = Color.white;
+                HierarchyLabelScript.textColor = Color.black;
             }
         }
         // 存在しないテーマ番号の場合
         else
         {
-            if (HierarchyLabelScript.presetID == 9)
+            if (HierarchyLabelScript.presetID == 11)
             {
                 HierarchyLabelScript.labelColor = HierarchyLabelScript.customLabelColor;
                 HierarchyLabelScript.textColor = HierarchyLabelScript.customTextColor;
