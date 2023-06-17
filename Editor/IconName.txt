@@ -129,7 +129,6 @@ CanvasRenderer Icon
 CanvasScaler Icon
 CapsuleCollider Icon
 CapsuleCollider2D Icon
-CGProgram Icon
 CharacterController Icon
 CharacterJoint Icon
 CheckerFloor
@@ -524,15 +523,12 @@ SceneSet Icon
 SceneView2D
 SceneViewAlpha
 SceneViewAudio
-SceneViewAudio Off
 SceneViewCamera
 SceneViewFx
 SceneViewLighting
 SceneViewLighting Off
 SceneViewOrtho
 SceneViewRGB
-SceneViewSnap-Off
-SceneViewSnap-On
 SceneViewTools
 SceneViewVisibility
 scenevis_hidden
@@ -735,9 +731,6 @@ Update-Available
 UssScript Icon
 UxmlScript Icon
 Valid
-vcs_change
-vcs_document
-vcs_incoming
 VerticalLayoutGroup Icon
 VerticalLayoutGroup Icon
 VerticalSplit

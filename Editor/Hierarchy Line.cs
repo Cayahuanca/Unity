@@ -16,6 +16,9 @@ public class HierarchyLines : MonoBehaviour
 
         var objTransform = obj.transform;
 
+        string unityVersion = UnityEngine.Application.unityVersion;
+        int majorVersion = int.Parse(unityVersion.Split('.')[0]);
+
         if (objTransform.parent != null)
         {
             Handles.BeginGUI();
@@ -67,7 +70,14 @@ public class HierarchyLines : MonoBehaviour
                 if (currentParent.parent != null && currentParent.GetSiblingIndex() != currentParent.parent.childCount - 1) {
                     var dotlinestart = new Vector2(selectionRect.xMin - 22 - i * 14, selectionRect.yMin);
                     var dotlineend = new Vector2(selectionRect.xMin - 22 - i * 14, selectionRect.yMax);
-                    Handles.DrawDottedLine(dotlinestart, dotlineend, 0.5f);
+                    if (majorVersion <= 2019)
+                    {
+                        Handles.DrawDottedLine(dotlinestart, dotlineend, 0.5f);
+                    }
+                    else
+                    {
+                        Handles.DrawLine(dotlinestart, dotlineend);
+                    }
                 }
             }
             Handles.EndGUI();

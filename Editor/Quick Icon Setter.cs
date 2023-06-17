@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 public class GameObjectIconWindow : EditorWindow
 {
@@ -23,6 +24,12 @@ public class GameObjectIconWindow : EditorWindow
 
     private void OnEnable()
     {
+        if (!Directory.Exists(iconFolderPath))
+        {
+            Directory.CreateDirectory(iconFolderPath);
+            AssetDatabase.Refresh();
+        }
+
         icons = new Texture2D[10];
         for (int i = 0; i < 10; i++)
         {
