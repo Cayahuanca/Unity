@@ -7,6 +7,7 @@ using System.Globalization;
 public class ObjectActivationToggle
 {
     private static bool HOAEnabled;
+    private static bool lastSelectionToggleState;
     private static bool SaveGlobal;
     private static bool ForceEnglish;
 
@@ -39,22 +40,39 @@ public class ObjectActivationToggle
 
         if (HOAEnabled)
         {
-        EditorGUI.BeginChangeCheck();
+            if (Event.current.alt && GUI.Toggle(rect, false, "") && Selection.gameObjects.Length > 1)
+            {
+                MultiObjects(Selection.gameObjects);
+            }
 
-        bool active = GUI.Toggle(rect, GameObject.activeSelf, "");
+            EditorGUI.BeginChangeCheck();
 
+            bool active = GUI.Toggle(rect, GameObject.activeSelf, "");
 
-        if (active != GameObject.activeSelf)
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(GameObject, "Toggle Active");
+                GameObject.SetActive(active);
+            }
+        }
+    }
+
+    private static void MultiObjects(GameObject[] selectedGameObjects)
+    {
+        if (selectedGameObjects == null || selectedGameObjects.Length == 0)
         {
-            GameObject.SetActive(active);
+            return;
         }
 
-        if (EditorGUI.EndChangeCheck())
+        bool newState = !lastSelectionToggleState;
+
+        foreach (GameObject GameObjects in selectedGameObjects)
         {
-            Undo.RecordObject(GameObject, "Toggle Active");
-            GameObject.SetActive(active);
+            Undo.RecordObject(GameObjects, "Toggle Active");
+            GameObjects.SetActive(newState);
         }
-        }
+
+        lastSelectionToggleState = newState;
     }
 
     // Project Settings に設定画面を表示

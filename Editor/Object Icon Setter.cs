@@ -27,7 +27,20 @@ public class IconSetter : EditorWindow
     [MenuItem("GameObject/Object Icon Setter", false, 20)]
     public static void ShowWindow2()
     {
-        GetWindow<IconSetter>("Icon Setter");
+        IconSetter window = GetWindow<IconSetter>("Icon Setter");
+
+        // 選択された GameObject を取得し、objectCount に代入する
+        GameObject[] selectedObjects = Selection.gameObjects;
+        window.objectCount = selectedObjects.Length;
+
+        // 選択された GameObject を targetObjects 配列に代入する
+        window.targetObjects = new GameObject[selectedObjects.Length];
+        for (int i = 0; i < selectedObjects.Length; i++)
+        {
+            window.targetObjects[i] = selectedObjects[i];
+        }
+
+        window.Show();
     }
 
 
@@ -53,9 +66,10 @@ public static class GUILayoutEx
         LoadSettings();
     
         string SelectIconText = "Select the icon you want to use";
+        string DeselectIconText = "Deselect Icon";
         string SelectObjectText = "Select the object you want to apply the icon to";
         string ObjectCountText = "Number of objects";
-        string ResetText = "Reset";
+        string ResetText = "Deselect Objects";
         string ApplyText = "Apply Icon";
         string ExportBuiltInIconsText = "Export Built-in Icons (Generate about 1500 icon files). It needs some times.";
 
@@ -67,6 +81,7 @@ public static class GUILayoutEx
         if (ForceEnglish == false && lang == "ja-JP")
         {
             SelectIconText = "アイコンを選択";
+            DeselectIconText = "アイコン画像の選択を解除";
             SelectObjectText = "アイコンを設定するオブジェクト";
             ObjectCountText = "アイコンを適用するオブジェクトの数";
             ResetText = "オブジェクトの選択を解除";
@@ -76,7 +91,7 @@ public static class GUILayoutEx
 
         GUILayout.Label(SelectIconText, EditorStyles.boldLabel);
 
-        string[] IconModeText = { "Main Folder", "Builtin Icon", "Folder 1", "Folder 2", "Folder 3" };
+        string[] IconModeText = { "All Icons", "Builtin Icon", "Folder 1", "Folder 2", "Folder 3" };
         IconMode = GUILayout.SelectionGrid(IconMode, IconModeText,  5);
     
         if(IconMode == 1)
@@ -202,6 +217,11 @@ public static class GUILayoutEx
             GUILayout.BeginVertical();
             GUILayout.Label("Selected Icon: " + icon.name);
             GUILayout.Label("Path: " + AssetDatabase.GetAssetPath(icon));
+            GUILayout.Space(20);
+            if (GUILayout.Button(DeselectIconText))
+            {
+                icon = null;
+            }
             GUILayout.EndVertical();
             GUILayout.Box(icon, GUILayout.Width(60), GUILayout.Height(60));
             GUILayout.EndHorizontal();
@@ -239,7 +259,6 @@ public static class GUILayoutEx
             objectCount = 1;
         }
 
-
         GUILayout.Space(20);
 
         if (GUILayout.Button(ApplyText))
@@ -247,11 +266,23 @@ public static class GUILayoutEx
             ApplyIcon();
         }
         GUILayout.Space(20);
+
+        // 複数のオブジェクトの、ドラッグによる追加に対応
+        var draggedObjects = DragAndDrop.objectReferences;
+        if (draggedObjects != null && draggedObjects.Length > 0)
+        {
+            objectCount = draggedObjects.Length;
+            targetObjects = new GameObject[objectCount];
+            for (int i = 0; i < objectCount; i++)
+            {
+                targetObjects[i] = draggedObjects[i] as GameObject;
+            }
+        }
     }
 
     private void ApplyIcon()
     {
-        if (icon == null || targetObjects == null || targetObjects.Length == 0) return;
+        if (targetObjects == null || targetObjects.Length == 0) return;
 
         var iconPath = AssetDatabase.GetAssetPath(icon);
         var iconGUID = AssetDatabase.AssetPathToGUID(iconPath);
@@ -265,7 +296,14 @@ public static class GUILayoutEx
 
             if (serializedProperty != null && serializedProperty.propertyType == SerializedPropertyType.ObjectReference)
             {
-                serializedProperty.objectReferenceValue = AssetDatabase.LoadAssetAtPath(iconPath, typeof(Texture2D));
+                if (icon == null)
+                {
+                    serializedProperty.objectReferenceValue = null;
+                }
+                else
+                {
+                    serializedProperty.objectReferenceValue = AssetDatabase.LoadAssetAtPath(iconPath, typeof(Texture2D));
+                }
                 serializedObject.ApplyModifiedPropertiesWithoutUndo();
             }
         }
