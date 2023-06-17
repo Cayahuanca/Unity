@@ -44,6 +44,8 @@ public class FileInfoWindow : EditorWindow
 
             string result = string.Format("{0:0.##} {1}", length, sizes[order]);
 
+            EditorGUILayout.Space();
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("File Name: ");
             EditorGUILayout.LabelField(obj.name + fileInfo.Extension);
@@ -64,17 +66,11 @@ public class FileInfoWindow : EditorWindow
             EditorGUILayout.LabelField(fileInfo.LastWriteTime.ToString());
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Path: ");
-            EditorGUILayout.TextField(path);
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.SelectableLabel(path);
 
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Full Path: ");
-            EditorGUILayout.TextField(projectPath + path);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Space();
+            EditorGUILayout.SelectableLabel(projectPath + path);
         }
 
         EditorGUILayout.EndScrollView();
