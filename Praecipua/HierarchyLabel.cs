@@ -21,66 +21,51 @@ public class HierarchyLabel : MonoBehaviour
 }
 
 [CustomEditor(typeof(HierarchyLabel))]
+[CanEditMultipleObjects]
 public class HierarchyLabelScriptEditor : Editor
 {
-    
-    void OnInspectorUpdate()
+    // 有効化時に呼ばれる
+    private void OnEnable()
     {
-        Repaint();
-        EditorApplication.RepaintHierarchyWindow();
+        HierarchyLabel HierarchyLabelScript = (HierarchyLabel)target;
+        LoadSettings(HierarchyLabelScript);
+        SetColor(HierarchyLabelScript);
     }
+
+    // Inspector の表示内容
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
         HierarchyLabel HierarchyLabelScript = (HierarchyLabel)target;
 
-        EditorGUILayout.Space();
-        EditorGUI.BeginChangeCheck();
-        HierarchyLabelScript.customLabelColor = EditorGUILayout.ColorField("Label Color", HierarchyLabelScript.customLabelColor);
-        HierarchyLabelScript.customTextColor = EditorGUILayout.ColorField("Text Color", HierarchyLabelScript.customTextColor);
-        if (EditorGUI.EndChangeCheck())
-        {
-            HierarchyLabelScript.customLabelColor.a = 1.0f;
-            HierarchyLabelScript.customTextColor.a = 1.0f;
-            HierarchyLabelScript.presetID = 9;
-            SetColor(HierarchyLabelScript);
-        }
-
-        EditorGUILayout.Space();
-
+        // テーマの設定
         EditorGUILayout.BeginVertical();
-        EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal();
 
-        EditorGUI.BeginChangeCheck();
-        //HierarchyLabelScript.themeID = EditorGUILayout.IntField("Theme", HierarchyLabelScript.themeID);
+                EditorGUI.BeginChangeCheck();
+                //HierarchyLabelScript.themeID = EditorGUILayout.IntField("Theme", HierarchyLabelScript.themeID);
         
-        if (GUILayout.Button("Theme 0"))
-        {
-            HierarchyLabelScript.themeID = 0;
-        }
-        if (GUILayout.Button("Theme 1"))
-        {
-            HierarchyLabelScript.themeID = 1;
-        }
-        if (GUILayout.Button("Theme 2"))
-        {
-            HierarchyLabelScript.themeID = 2;
-        }
-        if (EditorGUI.EndChangeCheck())
-        {
-            SetColor(HierarchyLabelScript);
-            SaveSettings(HierarchyLabelScript);
-        }
-
-        if (GUILayout.Button("Check Theme"))
-        {
-            LoadSettings(HierarchyLabelScript);
-            SetColor(HierarchyLabelScript);
-        }
-
-        EditorGUILayout.EndHorizontal();
+                    if (GUILayout.Button("Theme 0"))
+                    {
+                        HierarchyLabelScript.themeID = 0;
+                    }
+                    if (GUILayout.Button("Theme 1"))
+                    {
+                        HierarchyLabelScript.themeID = 1;
+                    }
+                    if (GUILayout.Button("Theme 2"))
+                    {
+                        HierarchyLabelScript.themeID = 2;
+                    }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(HierarchyLabelScript);
+                    SaveSettings(HierarchyLabelScript);
+                }
+            EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
         
+        // プリセットカラーの設定
         EditorGUILayout.LabelField("Color Presets");
         string color0 = "Red";
         string color1 = "Green";
@@ -107,65 +92,72 @@ public class HierarchyLabelScriptEditor : Editor
         }
 
         EditorGUILayout.BeginVertical();
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button(color0))
-        {
-            HierarchyLabelScript.presetID = 0;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color1))
-        {
-            HierarchyLabelScript.presetID = 1;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color2))
-        {
-            HierarchyLabelScript.presetID = 2;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color3))
-        {
-            HierarchyLabelScript.presetID = 3;
-            SetColor(HierarchyLabelScript);
-        }
+            EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button(color0))
+                {
+                    HierarchyLabelScript.presetID = 0;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color1))
+                {
+                    HierarchyLabelScript.presetID = 1;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color2))
+                {
+                    HierarchyLabelScript.presetID = 2;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color3))
+                {
+                    HierarchyLabelScript.presetID = 3;
+                    SetColor(HierarchyLabelScript);
+                }
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.EndHorizontal();
-        EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button(color4))
+                {
+                    HierarchyLabelScript.presetID = 4;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color5))
+                {
+                    HierarchyLabelScript.presetID = 5;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color6))
+                {
+                    HierarchyLabelScript.presetID = 6;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color7))
+                {
+                    HierarchyLabelScript.presetID = 7;
+                    SetColor(HierarchyLabelScript);
+                }
+                if (GUILayout.Button(color8))
+                {
+                    HierarchyLabelScript.presetID = 8;
+                    SetColor(HierarchyLabelScript);
+                }
+            EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndVertical();
 
-        if (GUILayout.Button(color4))
+        EditorGUILayout.Space();
+
+        // カスタムカラーの設定
+        EditorGUILayout.LabelField("Custom Color");
+        EditorGUI.BeginChangeCheck();
+        HierarchyLabelScript.customLabelColor = EditorGUILayout.ColorField("Label Color", HierarchyLabelScript.customLabelColor);
+        HierarchyLabelScript.customTextColor = EditorGUILayout.ColorField("Text Color", HierarchyLabelScript.customTextColor);
+        if (EditorGUI.EndChangeCheck())
         {
-            HierarchyLabelScript.presetID = 4;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color5))
-        {
-            HierarchyLabelScript.presetID = 5;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color6))
-        {
-            HierarchyLabelScript.presetID = 6;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color7))
-        {
-            HierarchyLabelScript.presetID = 7;
-            SetColor(HierarchyLabelScript);
-        }
-        if (GUILayout.Button(color8))
-        {
-            HierarchyLabelScript.presetID = 8;
-            SetColor(HierarchyLabelScript);
-        }
-        /*
-        if (GUILayout.Button(color9))
-        {
+            HierarchyLabelScript.customLabelColor.a = 1.0f;
+            HierarchyLabelScript.customTextColor.a = 1.0f;
             HierarchyLabelScript.presetID = 9;
             SetColor(HierarchyLabelScript);
         }
-        */
-        EditorGUILayout.EndHorizontal();
-        EditorGUILayout.EndVertical();
 
         EditorGUILayout.Space();
 
@@ -173,47 +165,50 @@ public class HierarchyLabelScriptEditor : Editor
         EditorGUILayout.LabelField("Text Presets");
         EditorGUILayout.BeginVertical();
         // 文字の装飾
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Toggle(HierarchyLabelScript.textBold, "Bold"))
-        {
-            HierarchyLabelScript.textBold = true;
-        }
-        else
-        {
-            HierarchyLabelScript.textBold = false;
-        }
-        if (GUILayout.Toggle(HierarchyLabelScript.textItalic, "Italic"))
-        {
-            HierarchyLabelScript.textItalic = true;
-        }
-        else
-        {
-            HierarchyLabelScript.textItalic = false;
-        }
-        EditorGUILayout.EndHorizontal();
-        // 文字の位置
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Left"))
-        {
-            HierarchyLabelScript.textPosition = 0;
-        }
-        if (GUILayout.Button("Center"))
-        {
-            HierarchyLabelScript.textPosition = 1;
-        }
-        if (GUILayout.Button("Right"))
-        {
-            HierarchyLabelScript.textPosition = 2;
-        }
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Toggle(HierarchyLabelScript.textBold, "Bold"))
+                {
+                    HierarchyLabelScript.textBold = true;
+                }
+                else
+                {
+                    HierarchyLabelScript.textBold = false;
+                }
+                if (GUILayout.Toggle(HierarchyLabelScript.textItalic, "Italic"))
+                {
+                    HierarchyLabelScript.textItalic = true;
+                }
+                else
+                {
+                    HierarchyLabelScript.textItalic = false;
+                }
+            EditorGUILayout.EndHorizontal();
+            
+            // 文字の位置
+            EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Left"))
+                {
+                    HierarchyLabelScript.textPosition = 0;
+                }
+                if (GUILayout.Button("Center"))
+                {
+                    HierarchyLabelScript.textPosition = 1;
+                }
+                if (GUILayout.Button("Right"))
+                {
+                    HierarchyLabelScript.textPosition = 2;
+                }
+            EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
 
         serializedObject.ApplyModifiedProperties();
         EditorApplication.RepaintHierarchyWindow();
     }
 
+    // テーマ、プリセットに応じた色の適用
     private void SetColor(HierarchyLabel HierarchyLabelScript)
     {
+        // テーマ0
         if (HierarchyLabelScript.themeID == 0)
         {
             if (HierarchyLabelScript.presetID == 0)
@@ -272,6 +267,7 @@ public class HierarchyLabelScriptEditor : Editor
                 HierarchyLabelScript.textColor = Color.black;
             }
         }
+        // テーマ1
         else if (HierarchyLabelScript.themeID == 1)
         {
             if (HierarchyLabelScript.presetID == 0)
@@ -330,6 +326,7 @@ public class HierarchyLabelScriptEditor : Editor
                 HierarchyLabelScript.textColor = Color.white;
             }
         }
+        // 存在しないテーマ番号の場合
         else
         {
             if (HierarchyLabelScript.presetID == 9)
@@ -344,6 +341,8 @@ public class HierarchyLabelScriptEditor : Editor
             }
         }
     }
+
+    // テーマ番号を読み込み
     private static void LoadSettings(HierarchyLabel HierarchyLabelScript)
     {
         //string ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
@@ -352,7 +351,7 @@ public class HierarchyLabelScriptEditor : Editor
         HierarchyLabelScript.themeID = HierarchyLabelScript.HLThemeStr == null ? 0 : System.Int32.Parse(HierarchyLabelScript.HLThemeStr);
     }
 
-    // 設定を保存
+    // テーマ番号を保存
     private static void SaveSettings(HierarchyLabel HierarchyLabelScript)
     {
         EditorUserSettings.SetConfigValue(HierarchyLabelScript.HLThemeKey, HierarchyLabelScript.themeID.ToString());

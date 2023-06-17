@@ -42,6 +42,8 @@ public class ComponentRemoverWindow : EditorWindow
             AddTargetObject();
         }
 
+        EditorGUI.BeginChangeCheck();
+
         for (int i = 0; i < targetObjects.Count; i++)
         {
             EditorGUILayout.BeginHorizontal();
@@ -60,6 +62,11 @@ public class ComponentRemoverWindow : EditorWindow
             {
                 targetObjects[i] = newTargetObject;
             }
+        }
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            ListComponents();
         }
 
         EditorGUILayout.Space(10f);
@@ -87,7 +94,15 @@ public class ComponentRemoverWindow : EditorWindow
                 }
                 for (int i = 0; i < components.Length; i++)
                 {
-                    string componentName = ObjectNames.NicifyVariableName(components[i].GetType().Name);
+                    string componentName;
+                    if (components[i] != null)
+                    {
+                        componentName = ObjectNames.NicifyVariableName(components[i].GetType().Name);
+                    }
+                    else
+                    {
+                        componentName = "Missing Script (Can't remove))";
+                    }
                     removeFlags[i] = EditorGUILayout.Toggle(componentName, removeFlags[i]);
                 }
             }
@@ -170,17 +185,21 @@ public class ComponentRemoverWindow : EditorWindow
     }
 
     private void RemoveComponent(GameObject obj, Component component)
+{
+    if (component != null)
     {
         var componentsInChildren = obj.GetComponentsInChildren(component.GetType());
         foreach (var childComponent in componentsInChildren)
         {
             if (childComponent != component)
             {
-                DestroyImmediate(childComponent);
+                Undo.DestroyObjectImmediate(childComponent);
             }
         }
-        DestroyImmediate(component);
+        Undo.DestroyObjectImmediate(component);
     }
+}
+
 
     private void ResetWindow()
     {

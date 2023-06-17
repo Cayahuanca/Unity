@@ -186,6 +186,13 @@ public static class GUILayoutEx
         GUILayout.Space(10);
         searchText = EditorGUILayout.TextField("Search Icons", searchText);
         Texture2D[] filteredIcons = icons.Where(x => x.name.ToLower().Contains(searchText.ToLower())).ToArray();
+        if (searchText == "()()()")
+        {
+            Debug.Log("huro: (''UDON OISII'')");
+            Debug.Log("satsuki: for(;;) Debug.Log(''Udon Koneteke'');");
+            Debug.Log("mina: Udon Behaviour");
+            searchText = "";
+        }
 
         // それらの Texture2D をスクロール表示
         scrollPosIcn = GUILayout.BeginScrollView(scrollPosIcn);
