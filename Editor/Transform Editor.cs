@@ -73,7 +73,7 @@ public class TransformEditor : Editor
             if (!isWorldPositionEditable)
             {
                 // ワールド座標を表示
-                EditorGUILayout.LabelField(worldPositionLabel, WorldPosition.ToString());
+                EditorGUILayout.LabelField(worldPositionLabel, WorldPosition.ToString("F4"));
             }
             else
             {
@@ -101,7 +101,7 @@ public class TransformEditor : Editor
             if (!isWorldPositionEditable)
             {
                 // ワールド回転を表示
-                EditorGUILayout.LabelField(worldRotationLabel, WorldRotation.eulerAngles.ToString());
+                EditorGUILayout.LabelField(worldRotationLabel, WorldRotation.eulerAngles.ToString("F4"));
             }
             else
             {
@@ -125,7 +125,7 @@ public class TransformEditor : Editor
                 Undo.RecordObject(transform, "Local Scale Change");
                 transform.localScale = LocalScale;
             }
-            EditorGUILayout.LabelField(worldScaleLabel, GetAbsoluteScale(transform).ToString());
+            EditorGUILayout.LabelField(worldScaleLabel, GetAbsoluteScale(transform).ToString("F4"));
         }
         else
         {
