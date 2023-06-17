@@ -385,7 +385,6 @@ P4_OutOfSync
 P4_RedLeftParenthesis
 P4_RedRightParenthesis
 P4_Updating
-PackageBadgeDelete
 PackageBadgeNew
 ParentConstraint Icon
 Particle Effect
@@ -526,7 +525,6 @@ SceneViewAudio
 SceneViewCamera
 SceneViewFx
 SceneViewLighting
-SceneViewLighting Off
 SceneViewOrtho
 SceneViewRGB
 SceneViewTools
@@ -802,4 +800,3 @@ winbtn_win_restore_a
 winbtn_win_restore_h
 WindZone Gizmo
 WindZone Icon
-WorldAnchor Icon
