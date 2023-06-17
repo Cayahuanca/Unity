@@ -1,43 +1,192 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class ComponentRemoverWindow : EditorWindow
 {
-    private GameObject targetObject;
+    private List<GameObject> targetObjects;
+    private Dictionary<GameObject, Component[]> componentsDict;
+    private Dictionary<GameObject, bool[]> removeFlagsDict;
+    private Vector2 scrollPosition;
 
     [MenuItem("Window/Component Remover")]
     public static void ShowWindow()
     {
         var window = GetWindow<ComponentRemoverWindow>();
-        window.titleContent = new GUIContent("Collider Remover");
+        window.titleContent = new GUIContent("Component Remover");
         window.Show();
+    }
+
+    private void OnEnable()
+    {
+        targetObjects = new List<GameObject>();
+        componentsDict = new Dictionary<GameObject, Component[]>();
+        removeFlagsDict = new Dictionary<GameObject, bool[]>();
     }
 
     private void OnGUI()
     {
-        EditorGUILayout.LabelField("Target Object", EditorStyles.boldLabel);
-        targetObject = EditorGUILayout.ObjectField(targetObject, typeof(GameObject), true) as GameObject;
-
-        if (GUILayout.Button("Remove Colliders"))
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Target Objects", EditorStyles.boldLabel);
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Add Target Object", GUILayout.Width(120f)))
         {
-            if (targetObject != null)
+            AddTargetObject();
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space(5f);
+
+        if (targetObjects.Count == 0)
+        {
+            AddTargetObject();
+        }
+
+        for (int i = 0; i < targetObjects.Count; i++)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GameObject newTargetObject = EditorGUILayout.ObjectField(targetObjects[i], typeof(GameObject), true) as GameObject;
+
+            if (GUILayout.Button("Remove", GUILayout.Width(70f)) && targetObjects[i] != null)
             {
-                RemoveColliders(targetObject);
-                Debug.Log("Colliders removed from the target object and its children.");
+                RemoveTargetObject(i);
+                break;
             }
-            else
+
+            EditorGUILayout.EndHorizontal();
+
+            // 重複したオブジェクトを選択した場合は追加しない
+            if (newTargetObject != null && !targetObjects.Contains(newTargetObject))
             {
-                Debug.LogError("No target object selected.");
+                targetObjects[i] = newTargetObject;
+            }
+        }
+
+        EditorGUILayout.Space(10f);
+
+        if (GUILayout.Button("Show Components"))
+        {
+            ListComponents();
+        }
+
+        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+        if (componentsDict != null)
+        {
+            EditorGUILayout.Space(10f);
+
+            foreach (var entry in componentsDict)
+            {
+                GameObject targetObject = entry.Key;
+                Component[] components = entry.Value;
+                bool[] removeFlags = removeFlagsDict[targetObject];
+
+                if (targetObject != null)
+                {
+                    EditorGUILayout.LabelField(targetObject.name, EditorStyles.boldLabel);
+                }
+                for (int i = 0; i < components.Length; i++)
+                {
+                    string componentName = ObjectNames.NicifyVariableName(components[i].GetType().Name);
+                    removeFlags[i] = EditorGUILayout.Toggle(componentName, removeFlags[i]);
+                }
+            }
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.Space(10f);
+
+            if (GUILayout.Button("Remove Components"))
+            {
+                RemoveSelectedComponents();
+            }
+
+            if (GUILayout.Button("Reset Window"))
+            {
+                ResetWindow();
             }
         }
     }
 
-    private void RemoveColliders(GameObject obj)
+    private void AddTargetObject()
     {
-        var colliders = obj.GetComponentsInChildren<Collider>();
-        foreach (var collider in colliders)
+        targetObjects.Add(null);
+    }
+
+    private void RemoveTargetObject(int index)
+    {
+        GameObject targetObject = targetObjects[index];
+        targetObjects.RemoveAt(index);
+        componentsDict.Remove(targetObject);
+        removeFlagsDict.Remove(targetObject);
+    }
+
+    private void ListComponents()
+    {
+        componentsDict.Clear();
+        removeFlagsDict.Clear();
+
+        foreach (var targetObject in targetObjects)
         {
-            DestroyImmediate(collider);
+            if (targetObject != null)
+            {
+                Component[] components = targetObject.GetComponents<Component>();
+                bool[] removeFlags = new bool[components.Length];
+
+                List<Component> filteredComponents = new List<Component>();
+                foreach (var component in components)
+                {
+                    if (!(component is Transform))
+                    {
+                        filteredComponents.Add(component);
+                    }
+                }
+
+                componentsDict.Add(targetObject, filteredComponents.ToArray());
+                removeFlagsDict.Add(targetObject, removeFlags);
+            }
         }
+    }
+
+    private void RemoveSelectedComponents()
+    {
+        foreach (var entry in componentsDict)
+        {
+            GameObject targetObject = entry.Key;
+            Component[] components = entry.Value;
+            bool[] removeFlags = removeFlagsDict[targetObject];
+
+            for (int i = 0; i < components.Length; i++)
+            {
+                if (removeFlags[i])
+                {
+                    if (components[i] != null)
+                    {
+                        RemoveComponent(targetObject, components[i]);
+                        Debug.Log("Component removed: " + ObjectNames.NicifyVariableName(components[i].GetType().Name));
+                    }
+                }
+            }
+        }
+    }
+
+    private void RemoveComponent(GameObject obj, Component component)
+    {
+        var componentsInChildren = obj.GetComponentsInChildren(component.GetType());
+        foreach (var childComponent in componentsInChildren)
+        {
+            if (childComponent != component)
+            {
+                DestroyImmediate(childComponent);
+            }
+        }
+        DestroyImmediate(component);
+    }
+
+    private void ResetWindow()
+    {
+        targetObjects.Clear();
+        componentsDict.Clear();
+        removeFlagsDict.Clear();
+        scrollPosition = Vector2.zero;
     }
 }
