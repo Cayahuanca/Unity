@@ -28,7 +28,6 @@ public class TransformEditor : Editor
         var WorldRotation = transform.rotation;
 
         string toggleText = "Edit World Position and Rotation";
-        string toggleDescription = "Using World Position may cause the numbers to continuously change.";
         string PositionLabel = "Position";
         string localPositionLabel = "Position (Local)";
         string worldPositionLabel = "Position (World)";
@@ -42,7 +41,6 @@ public class TransformEditor : Editor
         if (ForceEnglish == false && lang == "ja-JP")
         {
             toggleText = "ワールド座標と回転を編集";
-            toggleDescription = "ワールド座標を使用すると、数値が入力していないときに変動し続ける場合があります。";
             PositionLabel = "位置";
             localPositionLabel = "座標 (ローカル)";
             worldPositionLabel = "座標 (ワールド)";
@@ -59,24 +57,26 @@ public class TransformEditor : Editor
         if (TEEnabled)
         {
             isWorldPositionEditable = EditorGUILayout.Toggle(toggleText, isWorldPositionEditable);
-            EditorGUILayout.LabelField(toggleDescription);
 
-            //ローカル座標を編集
-            EditorGUI.BeginChangeCheck();
-            LocalPosition  = EditorGUILayout.Vector3Field(localPositionLabel, LocalPosition);
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(transform, "Local Position Change");
-                transform.localPosition = LocalPosition;
-            }
-            
             if (!isWorldPositionEditable)
             {
+                 //ローカル座標を編集
+                EditorGUI.BeginChangeCheck();
+                LocalPosition  = EditorGUILayout.Vector3Field(localPositionLabel, LocalPosition);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(transform, "Local Position Change");
+                    transform.localPosition = LocalPosition;
+                }
+
                 // ワールド座標を表示
-                EditorGUILayout.LabelField(worldPositionLabel, WorldPosition.ToString("F4"));
+                EditorGUILayout.LabelField(worldPositionLabel, LocalPosition.ToString("F4"));
             }
             else
             {
+                // ローカル座標を表示
+                EditorGUILayout.LabelField(localPositionLabel, WorldPosition.ToString("F4"));
+
                 // ワールド座標を編集
                 EditorGUI.BeginChangeCheck();
                 WorldPosition = EditorGUILayout.Vector3Field(worldPositionLabel, WorldPosition);
@@ -89,22 +89,25 @@ public class TransformEditor : Editor
 
             EditorGUILayout.LabelField("");
 
-            // ローカル回転を編集
-            EditorGUI.BeginChangeCheck();
-            LocalRotation = Quaternion.Euler(EditorGUILayout.Vector3Field(localRotationLabel, LocalRotation.eulerAngles));
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(transform, "Local Rotation Change");
-                transform.localRotation = LocalRotation;
-            }
-
             if (!isWorldPositionEditable)
             {
+                // ローカル回転を編集
+                EditorGUI.BeginChangeCheck();
+                LocalRotation = Quaternion.Euler(EditorGUILayout.Vector3Field(localRotationLabel, LocalRotation.eulerAngles));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(transform, "Local Rotation Change");
+                    transform.localRotation = LocalRotation;
+                }
+
                 // ワールド回転を表示
                 EditorGUILayout.LabelField(worldRotationLabel, WorldRotation.eulerAngles.ToString("F4"));
             }
             else
             {
+                // ローカル回転を表示
+                EditorGUILayout.LabelField(localRotationLabel, LocalRotation.eulerAngles.ToString("F4"));
+
                 // ワールド回転を編集
                 EditorGUI.BeginChangeCheck();
                 WorldRotation = Quaternion.Euler(EditorGUILayout.Vector3Field(worldRotationLabel, WorldRotation.eulerAngles));
