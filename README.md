@@ -44,7 +44,7 @@ Almost of them were made for personal use and has not been verified in other env
   - Missing Component の警告表示
   - コンポーネントのアイコンを並べて表示
  
-![Features1](/Readme/EEXFeatures1.png)
+![Features1](/Readme/EEXFeatures1.PNG)
 
 - Custom icon settings for objects
   - Support for loading Unity built-in icons
@@ -58,7 +58,7 @@ Almost of them were made for personal use and has not been verified in other env
 - インポートしたファイル情報の表示
 - アバターなどの三面図
 
-![Features2](/Readme/EEXFeatures2.png)
+![Features2](/Readme/EEXFeatures2.PNG)
 
 - Batch deletion of components, including child objects
 - Editing object coordinates and rotation relative to the world
@@ -67,7 +67,7 @@ Almost of them were made for personal use and has not been verified in other env
 - 子オブジェクト含めた、コンポーネントの一括削除
 - ワールド基準でのオブジェクトの座標や回転の編集
 - ポリゴン数の表示
-![Features3](/Readme/EEXFeatures3.png)
+![Features3](/Readme/EEXFeatures3.PNG)
   
 - Context menu to open in Visual Studio Code 
 - Visual Studio Code で開くコンテキストメニューの追加
