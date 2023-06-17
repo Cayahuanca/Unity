@@ -75,8 +75,9 @@ public static class ComponentIconDrawer
                 {
                     if (iconCount >= MAX_ICONS) break;
 
-                    // Transform コンポーネントのアイコンは除外する
+                    // Transform コンポーネント、Hierarchy Label のアイコンは除外する
                     if (component is Transform) continue;
+                    if (component is HierarchyLabel) continue;
 
                     Texture2D icon = AssetPreview.GetMiniThumbnail(component);
 

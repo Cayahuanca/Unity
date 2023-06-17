@@ -71,10 +71,10 @@ public class HierarchyLabelScriptEditor : Editor
                 switch (HierarchyLabelScript.themeID)
                 {
                     case 0:
-                        colors = new string[] { "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Gray", "Black", "None" };
+                        colors = new string[] { "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Gray", "Black", "Unregistered" };
                         break;
                     case 1:
-                        colors = new string[] { "Yellow", "Orange", "Rose", "Pink", "Purple", "Blue", "Osian", "Blue", "Aqua", "Green" };
+                        colors = new string[] { "Yellow", "Orange", "Rose", "Pink", "Purple", "Blue", "Osian", "Light Blue", "Aqua", "Green" };
                         break;
                     case 2:
                         colors = new string[] { "White", "Black", "Light Gray", "Dark Gray", "Red", "Yellow", "Green", "Blue", "Orange", "Brown" };
@@ -412,7 +412,7 @@ public class HierarchyColor
 
         if (hierarchyLevel != 0)
         {
-            rect.x = rect.x + 24 + (hierarchyLevel * 16);
+            rect.x = rect.x + 28 + (hierarchyLevel * 14);
         }    
 
         // 文字の書体、位置を設定
@@ -451,13 +451,21 @@ public class HierarchyColor
                 break;
             case 1:
                 textStyle.alignment = TextAnchor.MiddleCenter;
+                if (hierarchyLevel != 0)
+                {
+                    textRect.x = rect.x - 14;
+                }
                 break;
             case 2:
                 textStyle.alignment = TextAnchor.MiddleRight;
-                textRect.x = rect.x - 8;
+                textRect.x = rect.x - 40;
                 break;
             default:
                 textStyle.alignment = TextAnchor.MiddleCenter;
+                if (hierarchyLevel != 0)
+                {
+                    textRect.x = rect.x - 14;
+                }
                 break;
         }
 

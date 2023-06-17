@@ -38,6 +38,9 @@ public class ObjectActivationToggle
 
         if (HOAEnabled)
         {
+            //HierarchyLabel HierarchyLabelScript = GameObject.GetComponent<HierarchyLabel>();
+            if (GameObject.GetComponent<HierarchyLabel>() != null) return;
+
             if (Event.current.alt && GUI.Toggle(rect, false, "") && Selection.gameObjects.Length > 1)
             {
                 MultiObjects(Selection.gameObjects);
