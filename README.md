@@ -23,7 +23,6 @@ Almost of them were made for personal use and has not been verified in other env
  
 ![Editor Enhancer Poster](/Readme/EEXPoster.png)
 
-## 1.a. Editor Enhancer's Features
 - within the hierarchy
   - Label with background color
     - Fine adjustments such as character style, position, color, theme function, etc.
