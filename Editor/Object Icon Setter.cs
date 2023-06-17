@@ -8,13 +8,16 @@ using System.Linq;
 public class IconSetter : EditorWindow
 {
     private static bool ForceEnglish;
-    private static bool BuiltInIconMode;
+
+    private int IconMode = 1;
+    private int objectCount = 1;
+
+    private string searchText = "";
 
     private GameObject[] targetObjects = new GameObject[1];
     private Texture2D icon;
-    private Vector2 scrollPos;
-    
-    private int objectCount = 1;
+    private Vector2 scrollPosIcn;
+    private Vector2 scrollPosObj;
 
     [MenuItem("Window/Object Icon Setter")]
     public static void ShowWindow()
@@ -40,111 +43,189 @@ public static class GUILayoutEx
     }
 
     private void OnGUI()
-{
-    LoadSettings();
-    
-    string SelectIconText = "Select the icon you want to use";
-    string SelectObjectText = "Select the object you want to apply the icon to";
-    string ObjectCountText = "Number of objects";
-    string ResetText = "Reset";
-    string ApplyText = "Apply Icon";
-    string ExportBuiltInIconsText = "Export Built-in Icons (Generate 2000+ icon files)";
-
-    CultureInfo ci = CultureInfo.InstalledUICulture;
-    string lang = ci.Name;
-
-    if (ForceEnglish == false && lang == "ja-JP")
     {
-        SelectIconText = "アイコンを選択";
-        SelectObjectText = "アイコンを設定するオブジェクト";
-        ObjectCountText = "アイコンを適用するオブジェクトの数";
-        ResetText = "オブジェクトの選択を解除";
-        ApplyText = "適用";
-        ExportBuiltInIconsText = "ビルトインアイコンを書き出す(約2000枚)";
-    }
-
-    GUILayout.Label(SelectIconText, EditorStyles.boldLabel);
-
-    BuiltInIconMode = GUILayout.Toggle(BuiltInIconMode, "Unity のビルトインアイコンから選択");
+        LoadSettings();
     
-    if(BuiltInIconMode)
-    {
-        if (GUILayout.Button(ExportBuiltInIconsText))
+        string SelectIconText = "Select the icon you want to use";
+        string SelectObjectText = "Select the object you want to apply the icon to";
+        string ObjectCountText = "Number of objects";
+        string ResetText = "Reset";
+        string ApplyText = "Apply Icon";
+        string ExportBuiltInIconsText = "Export Built-in Icons (Generate about 1500 icon files). It needs some times.";
+
+        string folderPath = "Assets/Praecipua/Icons";
+
+        CultureInfo ci = CultureInfo.InstalledUICulture;
+        string lang = ci.Name;
+
+        if (ForceEnglish == false && lang == "ja-JP")
         {
-            WriteIcon();
-            WriteIcon2();
-        }
-    }
-    
-    Texture2D[] icons;
-    if(BuiltInIconMode)
-    {
-        // Assets/Praecipua/Icons から、全ての Texture2D を取得
-        string[] iconFolders = { "Assets/Praecipua/UnityIcons", "Assets/Praecipua/UnityIcons2" };
-List<string> iconsPathsList = new List<string>();
-
-foreach (string iconFolder in iconFolders)
-{
-    string[] paths = AssetDatabase.FindAssets("t:Texture2D", new[] { iconFolder })
-                                  .Select(AssetDatabase.GUIDToAssetPath)
-                                  .ToArray();
-    iconsPathsList.AddRange(paths);
-}
-
-string[] iconsPaths = iconsPathsList.ToArray();
-
-            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
-    }
-    else
-    {
-        string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {"Assets/Praecipua/Icons"})
-            .Select(AssetDatabase.GUIDToAssetPath).ToArray();
-            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
-    }
-
-    // それらの Texture2D をスクロール表示
-    scrollPos = GUILayout.BeginScrollView(scrollPos);
-    GUILayout.BeginHorizontal();
-    int count = 0;
-    foreach (Texture2D tex in icons)
-    {
-        if (GUILayout.Button(tex, GUILayout.Width(60), GUILayout.Height(60)))
-        {
-            icon = tex;
+            SelectIconText = "アイコンを選択";
+            SelectObjectText = "アイコンを設定するオブジェクト";
+            ObjectCountText = "アイコンを適用するオブジェクトの数";
+            ResetText = "オブジェクトの選択を解除";
+            ApplyText = "適用";
+            ExportBuiltInIconsText = "ビルトインアイコン(約1500枚)を書き出す 少し時間がかかります";
         }
 
-        // 10枚ごとに改行
-        count++;
-        if (count % 10 == 0)
+        GUILayout.Label(SelectIconText, EditorStyles.boldLabel);
+
+        string[] IconModeText = { "Main Folder", "Builtin Icon", "Folder 1", "Folder 2", "Folder 3" };
+        IconMode = GUILayout.SelectionGrid(IconMode, IconModeText,  5);
+    
+        if(IconMode == 1)
         {
-            GUILayout.EndHorizontal();
+            if (GUILayout.Button(ExportBuiltInIconsText))
+            {
+                WriteIcon();
+                WriteIcon2();
+            }
+        }
+    
+        Texture2D[] icons = new Texture2D[0];
+        if(IconMode == 0)
+        {
+            folderPath = "Assets/Praecipua/Icons";
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+            string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {folderPath})
+                                                .Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+        }
+
+        else if(IconMode == 1)
+        {
+            string[] iconFolders = { "Assets/Praecipua/UnityIcons/1", "Assets/Praecipua/UnityIcons/2" };
+            foreach (string iconFolders1 in iconFolders)
+            {
+                if (!Directory.Exists(iconFolders1))
+                {
+                    Directory.CreateDirectory(iconFolders1);
+                    AssetDatabase.Refresh();
+                }
+            }
+            List<string> iconsPathsList = new List<string>();
+
+            foreach (string iconFolder in iconFolders)
+            {
+                string[] paths = AssetDatabase.FindAssets("t:Texture2D", new[] {iconFolder})
+                                            .Select(AssetDatabase.GUIDToAssetPath)
+                                            .ToArray();
+                iconsPathsList.AddRange(paths);
+            }
+
+            string[] iconsPaths = iconsPathsList.ToArray();
+            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+        }
+
+        else if(IconMode == 2)
+        {
+            folderPath = "Assets/Praecipua/Icons/1";
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+            string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {folderPath})
+                                                .Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+        }
+
+        else if(IconMode == 3)
+        {
+            folderPath = "Assets/Praecipua/Icons/2";
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+            string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {folderPath})
+                                                .Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+        }
+
+        else if(IconMode == 4)
+        {
+            folderPath = "Assets/Praecipua/Icons/3";
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+            string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {folderPath})
+                                                .Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+
+        }
+
+        // Texture2D を検索
+        GUILayout.Space(10);
+        searchText = EditorGUILayout.TextField("Search Icons", searchText);
+        Texture2D[] filteredIcons = icons.Where(x => x.name.ToLower().Contains(searchText.ToLower())).ToArray();
+
+        // それらの Texture2D をスクロール表示
+        scrollPosIcn = GUILayout.BeginScrollView(scrollPosIcn);
+        GUILayout.BeginHorizontal();
+        int count = 0;
+        foreach (Texture2D tex in filteredIcons)
+        {
+            if (GUILayout.Button(tex, GUILayout.Width(60), GUILayout.Height(60)))
+            {
+                icon = tex;
+            }
+
+            // 10枚ごとに改行
+            count++;
+            if (count % 10 == 0)
+            {
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+            }
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndScrollView();
+
+        GUILayout.Space(10);
+        if (icon != null)
+        {
             GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
+            GUILayout.Label("Selected Icon: " + icon.name);
+            GUILayout.Label("Path: " + AssetDatabase.GetAssetPath(icon));
+            GUILayout.EndVertical();
+            GUILayout.Box(icon, GUILayout.Width(60), GUILayout.Height(60));
+            GUILayout.EndHorizontal();
         }
-    }
-    GUILayout.EndHorizontal();
-    GUILayout.EndScrollView();
 
-    GUILayout.Space(10);
+        GUILayout.Space(10);
 
-    GUILayout.Label(SelectObjectText, EditorStyles.boldLabel);
+        GUILayout.Label(SelectObjectText, EditorStyles.boldLabel);
 
-    // 適用するオブジェクトの数を変更、リセット
+        // 適用するオブジェクトの数を変更、リセット
         GUILayout.BeginHorizontal();
         GUILayout.Label(ObjectCountText);
         objectCount = EditorGUILayout.IntField(objectCount, GUILayout.Width(50));
         GUILayout.EndHorizontal();
+
         if (objectCount < 1)
         {
             objectCount = 1;
         }
         if (objectCount != targetObjects.Length)
         {
+
             targetObjects = new GameObject[objectCount];
         }
+        scrollPosObj = EditorGUILayout.BeginScrollView(scrollPosObj, GUILayout.Height(100));
         for (int i = 0; i < targetObjects.Length; i++)
         {
             targetObjects[i] = (GameObject)EditorGUILayout.ObjectField(targetObjects[i], typeof(GameObject), true);
         }
+        EditorGUILayout.EndScrollView();
         
         if (GUILayout.Button(ResetText))
         {
@@ -153,14 +234,14 @@ string[] iconsPaths = iconsPathsList.ToArray();
         }
 
 
-    GUILayout.Space(20);
+        GUILayout.Space(20);
 
-    if (GUILayout.Button(ApplyText))
-    {
-        ApplyIcon();
+        if (GUILayout.Button(ApplyText))
+        {
+            ApplyIcon();
+        }
+        GUILayout.Space(20);
     }
-    GUILayout.Space(20);
-}
 
     private void ApplyIcon()
     {
@@ -187,7 +268,7 @@ string[] iconsPaths = iconsPathsList.ToArray();
     private static void WriteIcon()
     {
         // 保存先のフォルダパス
-        string folderPath = "Assets/Praecipua/UnityIcons";
+        string folderPath = "Assets/Praecipua/UnityIcons/1";
         // フォルダがなければ作成
         if (!Directory.Exists(folderPath))
         {
@@ -215,14 +296,20 @@ string[] iconsPaths = iconsPathsList.ToArray();
 
             if (pngData != null)
             {
-                if(icon.name.Contains("@2x"))
+                if(!icon.name.Contains("@"))
                 {
-                    if(icon.name.Contains(".sml"))
+                    if(!icon.name.Contains(".sml"))
                     {
-                        // ファイルパスを生成
-                        string filePath = Path.Combine(folderPath, icon.name + ".png");
-                        // ファイルに書き込み
-                        File.WriteAllBytes(filePath, pngData.EncodeToPNG());
+                        if(!icon.name.Contains("d_"))
+                        {
+                            if(!icon.name.Contains(" On"))
+                            {
+                                // ファイルパスを生成
+                                string filePath = Path.Combine(folderPath, "zzz_icn_" + icon.name + ".png");
+                                // ファイルに書き込み
+                                File.WriteAllBytes(filePath, pngData.EncodeToPNG());
+                            }
+                        }
                     }
                 }
                 else
@@ -240,7 +327,7 @@ string[] iconsPaths = iconsPathsList.ToArray();
     private static void WriteIcon2()
     {
         // 保存先のフォルダパス
-        string folderPath = "Assets/Praecipua/UnityIcons2";
+        string folderPath = "Assets/Praecipua/UnityIcons/2";
         // フォルダがなければ作成
         if (!Directory.Exists(folderPath))
         {
@@ -275,7 +362,7 @@ string[] iconsPaths = iconsPathsList.ToArray();
                     Graphics.CopyTexture(iconTexture, pngData);
 
                     // ファイルパスを生成
-                    string iconFilePath = Path.Combine(folderPath, iconName + ".png");
+                    string iconFilePath = Path.Combine(folderPath, "zzz_icn_" + iconName + ".png");
 
                     // ファイルに書き込み
                     File.WriteAllBytes(iconFilePath, pngData.EncodeToPNG());
