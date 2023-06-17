@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+
+using UnityEditor;
 using UnityEngine;
 
 public class HierarchyLine : MonoBehaviour
@@ -34,53 +36,65 @@ public class ColorScriptEditor : Editor
             if (GUILayout.Button("Red"))
             {
                 colorScript.objectColor = Color.red;
+                colorScript.textColor = Color.white;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Green"))
             {
                 colorScript.objectColor = Color.green;
+                colorScript.textColor = Color.black;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Blue"))
             {
                 colorScript.objectColor = Color.blue;
+                colorScript.textColor = Color.white;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Yellow"))
             {
                 colorScript.objectColor = Color.yellow;
+                colorScript.textColor = Color.black;
                 EditorApplication.RepaintHierarchyWindow();
             }
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Cyan"))
             {
                 colorScript.objectColor = Color.cyan;
+                colorScript.textColor = Color.black;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Magenta"))
             {
                 colorScript.objectColor = Color.magenta;
+                colorScript.textColor = Color.white;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("White"))
             {
                 colorScript.objectColor = Color.white;
+                colorScript.textColor = Color.black;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Gray"))
             {
                 colorScript.objectColor = Color.gray;
+                colorScript.textColor = Color.black;
                 EditorApplication.RepaintHierarchyWindow();
             }
             if (GUILayout.Button("Black"))
             {
                 colorScript.objectColor = Color.black;
+                colorScript.textColor = Color.white;
                 EditorApplication.RepaintHierarchyWindow();
             }
-            if (GUILayout.Button("Clear"))
+            /*if (GUILayout.Button("Clear"))
             {
                 colorScript.objectColor = Color.clear;
+                colorScript.textColor = Color.clear;
                 EditorApplication.RepaintHierarchyWindow();
-            }
+            }*/
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
 
@@ -161,6 +175,8 @@ public class HierarchyColor
                 textStyleState.textColor = colorScript.textColor;
                 textStyle.normal = textStyleState;
 
+                Rect textRect = new Rect(rect);
+                Vector2 labelSize = textStyle.CalcSize(new GUIContent(gameObject.name));
 
                 if (colorScript.textBold && colorScript.textItalic);
                 {
@@ -182,6 +198,7 @@ public class HierarchyColor
                 if (colorScript.textPosition == 0)
                 {
                     textStyle.alignment = TextAnchor.MiddleLeft;
+                    textRect.x = rect.x + 8;
                 }
                 if (colorScript.textPosition == 1)
                 {
@@ -190,11 +207,14 @@ public class HierarchyColor
                 if (colorScript.textPosition == 2)
                 {
                     textStyle.alignment = TextAnchor.MiddleRight;
+                    textRect.x = rect.x - 8;
                 }
 
                 EditorGUI.DrawRect(rect, colorScript.objectColor);
-                GUI.Label(rect, gameObject.name, textStyle);
+                GUI.Label(textRect, gameObject.name, textStyle);
             }
         }
     }
 }
+
+#endif
