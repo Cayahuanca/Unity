@@ -44,6 +44,7 @@ public class PolygonCounter : Editor
     }
 }
 
+/*
 [CustomEditor(typeof(SkinnedMeshRenderer))]
 public class PolygonCounterSkinned : Editor
 {
@@ -63,9 +64,9 @@ public class PolygonCounterSkinned : Editor
             PolygonText = "ポリゴン数";
         }
 
-        SkinnedMeshRenderer renderer = (SkinnedMeshRenderer)target;
-        
         base.OnInspectorGUI();
+
+        SkinnedMeshRenderer renderer = (SkinnedMeshRenderer)target;
         
         if (renderer.sharedMesh != null)
         {
@@ -82,3 +83,4 @@ public class PolygonCounterSkinned : Editor
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
     }
 }
+*/
