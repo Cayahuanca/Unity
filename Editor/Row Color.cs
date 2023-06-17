@@ -8,15 +8,10 @@ internal static class RowColor
 {
     private static bool RCHEnabled;
     private static bool RCPEnabled;
-    private static bool SaveGlobal;
     private static bool ForceEnglish;
-    
-    private static Color ProjectColor = new Color( 0, 0, 0, 0.08f );
-    private static Color HierarchyColor = new Color( 0, 0, 0, 0.08f );
 
     private const string RCHEnabledKey = "RowColor_Hierarchy_Enabled";
     private const string RCPEnabledKey = "RowColor_Project_Enabled:";
-    private const string SaveGlobalKey = "RowColor_Global";
 
     private static string HierarchyColor_R_Str;
     private static string HierarchyColor_G_Str;
@@ -38,6 +33,9 @@ internal static class RowColor
     private const string RCP_B = "RowColor_Project_B";
     private const string RCP_A = "RowColor_Project_A";
     
+    private static Color HierarchyColor = new Color( 0, 0, 0, 0.08f );
+    private static Color ProjectColor = new Color( 0, 0, 0, 0.08f );
+
     static RowColor()
     {
         EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
@@ -112,7 +110,8 @@ internal static class RowColor
             string RCPEnableText = "Enable Project Background Color";
             string RCHColorText  = "Hierarchy Background Color";
             string RCPColorText = "Project Background Color";
-            string SaveGlobalText = "Apply colors to all project";
+            string SaveGlobalText = "Save settings (shared with other project)";
+            string LoadGlobalText = "Load settings from shared settings.";
             
             if (ForceEnglish == false && lang == "ja-JP")
             {
@@ -120,7 +119,8 @@ internal static class RowColor
                 RCPEnableText = "プロジェクトの背景色を有効にする";
                 RCHColorText  = "ヒエラルキーの背景色";
                 RCPColorText = "プロジェクトの背景色";
-                SaveGlobalText = "全プロジェクトに色を適用する";
+                SaveGlobalText = "他のプロジェクトと共通の設定ファイルに書き込む";
+                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
             }
 
             RCHEnabled = EditorGUILayout.Toggle(RCHEnableText, RCHEnabled);
@@ -128,8 +128,16 @@ internal static class RowColor
 
             RCPEnabled = EditorGUILayout.Toggle(RCPEnableText, RCPEnabled);
             ProjectColor = EditorGUILayout.ColorField(RCPColorText, ProjectColor);
+            
+            if (GUILayout.Button(SaveGlobalText))
+            {
+                SaveSettingsGlobal();
+            }
 
-            SaveGlobal = EditorGUILayout.Toggle(SaveGlobalText, SaveGlobal);
+            if (GUILayout.Button(LoadGlobalText))
+            {
+                LoadSettingsGlobal();
+            }
 
             SaveSettings();
         }
@@ -140,53 +148,30 @@ internal static class RowColor
     {
         RCHEnabled = EditorUserSettings.GetConfigValue(RCHEnabledKey) == "1";
         RCPEnabled = EditorUserSettings.GetConfigValue(RCPEnabledKey) == "1";
-        SaveGlobal = EditorPrefs.GetBool(SaveGlobalKey);
-        if (!SaveGlobal)
-        {
-            SaveGlobal = EditorUserSettings.GetConfigValue(SaveGlobalKey) == "1";
-        }
+
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
 
-        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルから色を読み込み
-        if (SaveGlobal == true)
-        {
-            HierarchyColor = new Color(
-                EditorPrefs.GetFloat(RCH_R, HierarchyColor.r),
-                EditorPrefs.GetFloat(RCH_G, HierarchyColor.g),
-                EditorPrefs.GetFloat(RCH_B, HierarchyColor.b),
-                EditorPrefs.GetFloat(RCH_A, HierarchyColor.a));
+        HierarchyColor_R_Str = EditorUserSettings.GetConfigValue(RCH_R);
+            float.TryParse(HierarchyColor_R_Str, out HierarchyColor.r);
+        HierarchyColor_G_Str = EditorUserSettings.GetConfigValue(RCH_G);
+            float.TryParse(HierarchyColor_G_Str, out HierarchyColor.g);
+        HierarchyColor_B_Str = EditorUserSettings.GetConfigValue(RCH_B);
+            float.TryParse(HierarchyColor_B_Str, out HierarchyColor.b);
+        HierarchyColor_A_Str = EditorUserSettings.GetConfigValue(RCH_A);
+            float.TryParse(HierarchyColor_A_Str, out HierarchyColor.a);
 
-            ProjectColor = new Color(
-                EditorPrefs.GetFloat(RCP_R, ProjectColor.r),
-                EditorPrefs.GetFloat(RCP_G, ProjectColor.g),
-                EditorPrefs.GetFloat(RCP_B, ProjectColor.b),
-                EditorPrefs.GetFloat(RCP_A, ProjectColor.a));
-        }
-        // SetGlobal が False のときは、プロジェクト内の設定ファイルから色を読み込み
-        else
-        {
-            HierarchyColor_R_Str = EditorUserSettings.GetConfigValue(RCH_R);
-                float.TryParse(HierarchyColor_R_Str, out HierarchyColor.r);
-            HierarchyColor_G_Str = EditorUserSettings.GetConfigValue(RCH_G);
-                float.TryParse(HierarchyColor_G_Str, out HierarchyColor.g);
-            HierarchyColor_B_Str = EditorUserSettings.GetConfigValue(RCH_B);
-                float.TryParse(HierarchyColor_B_Str, out HierarchyColor.b);
-            HierarchyColor_A_Str = EditorUserSettings.GetConfigValue(RCH_A);
-                float.TryParse(HierarchyColor_A_Str, out HierarchyColor.a);
-            
-            HierarchyColor = new Color(HierarchyColor.r, HierarchyColor.g, HierarchyColor.b, HierarchyColor.a);
+        HierarchyColor = new Color(HierarchyColor.r, HierarchyColor.g, HierarchyColor.b, HierarchyColor.a);
 
-            ProjectColor_R_Str = EditorUserSettings.GetConfigValue(RCP_R);
-                float.TryParse(ProjectColor_R_Str, out ProjectColor.r);
-            ProjectColor_G_Str = EditorUserSettings.GetConfigValue(RCP_G);
-                float.TryParse(ProjectColor_G_Str, out ProjectColor.g);
-            ProjectColor_B_Str = EditorUserSettings.GetConfigValue(RCP_B);
-                float.TryParse(ProjectColor_B_Str, out ProjectColor.b);
-            ProjectColor_A_Str = EditorUserSettings.GetConfigValue(RCP_A);
-                float.TryParse(ProjectColor_A_Str, out ProjectColor.a);
+        ProjectColor_R_Str = EditorUserSettings.GetConfigValue(RCP_R);
+            float.TryParse(ProjectColor_R_Str, out ProjectColor.r);
+        ProjectColor_G_Str = EditorUserSettings.GetConfigValue(RCP_G);
+            float.TryParse(ProjectColor_G_Str, out ProjectColor.g);
+        ProjectColor_B_Str = EditorUserSettings.GetConfigValue(RCP_B);
+            float.TryParse(ProjectColor_B_Str, out ProjectColor.b);
+        ProjectColor_A_Str = EditorUserSettings.GetConfigValue(RCP_A);
+            float.TryParse(ProjectColor_A_Str, out ProjectColor.a);
 
-            ProjectColor = new Color(ProjectColor.r, ProjectColor.g, ProjectColor.b, ProjectColor.a);
-        }
+        ProjectColor = new Color(ProjectColor.r, ProjectColor.g, ProjectColor.b, ProjectColor.a);
     }
 
     // 設定を保存
@@ -194,24 +179,7 @@ internal static class RowColor
     {
         EditorUserSettings.SetConfigValue(RCHEnabledKey, RCHEnabled ? "1" : "0");
         EditorUserSettings.SetConfigValue(RCPEnabledKey, RCPEnabled ? "1" : "0");
-        EditorUserSettings.SetConfigValue(SaveGlobalKey, SaveGlobal ? "1" : "0");
-        EditorPrefs.SetBool(SaveGlobalKey, SaveGlobal);
 
-        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルに色を保存
-        if (SaveGlobal == true)
-        {
-            EditorPrefs.SetFloat(RCH_R, HierarchyColor.r);
-            EditorPrefs.SetFloat(RCH_G, HierarchyColor.g);
-            EditorPrefs.SetFloat(RCH_B, HierarchyColor.b);
-            EditorPrefs.SetFloat(RCH_A, HierarchyColor.a);
-
-            EditorPrefs.SetFloat(RCP_R, ProjectColor.r);
-            EditorPrefs.SetFloat(RCP_G, ProjectColor.g);
-            EditorPrefs.SetFloat(RCP_B, ProjectColor.b);
-            EditorPrefs.SetFloat(RCP_A, ProjectColor.a);
-        }
-
-        // SetGlobal の値にかかわらず、プロジェクト内の設定ファイルにも色を保存
         HierarchyColor_R_Str = HierarchyColor.r.ToString();
             EditorUserSettings.SetConfigValue(RCH_R, HierarchyColor_R_Str);
         HierarchyColor_G_Str = HierarchyColor.g.ToString();
@@ -229,5 +197,34 @@ internal static class RowColor
             EditorUserSettings.SetConfigValue(RCP_B, ProjectColor_B_Str);
         ProjectColor_A_Str = ProjectColor.a.ToString();
             EditorUserSettings.SetConfigValue(RCP_A, ProjectColor_A_Str);
+    }
+    
+    // 他のプロジェクトと設定を共有
+    private static void SaveSettingsGlobal()
+    {
+        EditorPrefs.SetFloat(RCH_R, HierarchyColor.r);
+        EditorPrefs.SetFloat(RCH_G, HierarchyColor.g);
+        EditorPrefs.SetFloat(RCH_B, HierarchyColor.b);
+        EditorPrefs.SetFloat(RCH_A, HierarchyColor.a);
+
+        EditorPrefs.SetFloat(RCP_R, ProjectColor.r);
+        EditorPrefs.SetFloat(RCP_G, ProjectColor.g);
+        EditorPrefs.SetFloat(RCP_B, ProjectColor.b);
+        EditorPrefs.SetFloat(RCP_A, ProjectColor.a);
+    }
+
+    private static void LoadSettingsGlobal()
+    {
+        HierarchyColor = new Color(
+            EditorPrefs.GetFloat(RCH_R, HierarchyColor.r),
+            EditorPrefs.GetFloat(RCH_G, HierarchyColor.g),
+            EditorPrefs.GetFloat(RCH_B, HierarchyColor.b),
+            EditorPrefs.GetFloat(RCH_A, HierarchyColor.a));
+
+        ProjectColor = new Color(
+            EditorPrefs.GetFloat(RCP_R, ProjectColor.r),
+            EditorPrefs.GetFloat(RCP_G, ProjectColor.g),
+            EditorPrefs.GetFloat(RCP_B, ProjectColor.b),
+            EditorPrefs.GetFloat(RCP_A, ProjectColor.a));
     }
 }

@@ -43,3 +43,42 @@ public class PolygonCounter : Editor
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
     }
 }
+
+[CustomEditor(typeof(SkinnedMeshRenderer))]
+public class PolygonCounterSkinned : Editor
+{
+    private static bool ForceEnglish;
+
+    public override void OnInspectorGUI()
+    {
+        LoadSettings();
+
+        string PolygonText = "Polygon Count";
+
+        CultureInfo ci = CultureInfo.InstalledUICulture;
+        string lang = ci.Name;
+
+        if (ForceEnglish == false && lang == "ja-JP")
+        {
+            PolygonText = "ポリゴン数";
+        }
+
+        SkinnedMeshRenderer renderer = (SkinnedMeshRenderer)target;
+        
+        base.OnInspectorGUI();
+        
+        if (renderer.sharedMesh != null)
+        {
+            EditorGUILayout.LabelField(PolygonText, (renderer.sharedMesh.triangles.Length / 3).ToString());
+        }
+        else
+        {
+            EditorGUILayout.LabelField(PolygonText, "null");
+        }
+    }
+    
+    private static void LoadSettings()
+    {
+        ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
+    }
+}

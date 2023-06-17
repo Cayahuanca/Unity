@@ -6,11 +6,8 @@ using System.Globalization;
 [InitializeOnLoad]
 public static class CustomIconInHierarchy
 {
-    private static Color backgroundColor;
-
     private static bool HCIEnabled;
     private static bool HCICenter;
-    private static bool SaveGlobal;
     private static bool ForceEnglish;
 
     private static int HCIOffset;
@@ -18,7 +15,8 @@ public static class CustomIconInHierarchy
     private const string HCIEnabledKey = "Hierarchy_Custom_Icon_Enabled";
     private const string HCICenterKey = "Hierarchy_Custom_Icon_Center";
     private static string HCIOffsetKey = "Hierarchy_Custom_Icon_Offset";
-    private const string SaveGlobalKey = "Hierarchy_Custom_Icon_Global";
+
+    private static Color backgroundColor;
 
     static CustomIconInHierarchy()
     {
@@ -102,22 +100,31 @@ public static class CustomIconInHierarchy
             string HCIEnableText = "Enable Hierarchy Object Custom Icon";
             string HCICenterText = "Superimpose the icon position on the default icon position";
             string HCIOffsetText = "Icon Offset";
-            string SaveGlobalText = "Apply positions to all project";
+            string SaveGlobalText = "Save settings (shared with other project)";
+            string LoadGlobalText = "Load settings from shared settings.";
             
             if (ForceEnglish == false && lang == "ja-JP")
             {
                 HCIEnableText = "ヒエラルキーに、オブジェクトのアイコンを表示する";
                 HCICenterText = "アイコンの位置をデフォルトのアイコンの位置に合わせる";
                 HCIOffsetText = "アイコンの位置を調整する";
-                SaveGlobalText = "全プロジェクトに配置を適用する";
+                SaveGlobalText = "他のプロジェクトと共通の設定ファイルに書き込む";
+                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
             }
 
             HCIEnabled = EditorGUILayout.Toggle(HCIEnableText, HCIEnabled);
             HCICenter = EditorGUILayout.Toggle(HCICenterText, HCICenter);
             HCIOffset = EditorGUILayout.IntField(HCIOffsetText, HCIOffset);
-            SaveGlobal = EditorGUILayout.Toggle(SaveGlobalText, SaveGlobal);
 
-            //SaveGlobal = EditorGUILayout.Toggle(SaveGlobalText, SaveGlobal);
+            if (GUILayout.Button(SaveGlobalText))
+            {
+                SaveSettingsGlobal();
+            }
+
+            if (GUILayout.Button(LoadGlobalText))
+            {
+                LoadSettingsGlobal();
+            }
 
             SaveSettings();
         }
@@ -126,45 +133,31 @@ public static class CustomIconInHierarchy
     private static void LoadSettings()
     {
         HCIEnabled = EditorUserSettings.GetConfigValue(HCIEnabledKey) == "1";
+        HCICenter = EditorUserSettings.GetConfigValue(HCICenterKey) == "1";
+        string HCIOffsetStr = EditorUserSettings.GetConfigValue(HCIOffsetKey);
+        HCIOffset = HCIOffsetStr == null ? 0 : System.Int32.Parse(HCIOffsetStr);
 
-
-        SaveGlobal = EditorPrefs.GetBool(SaveGlobalKey);
-        if (!SaveGlobal)
-        {
-            SaveGlobal = EditorUserSettings.GetConfigValue(SaveGlobalKey) == "1";
-        }
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
-
-        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルから読み込み
-        if (SaveGlobal == true)
-        {
-            HCICenter = EditorPrefs.GetBool(HCICenterKey);
-            HCIOffset = EditorPrefs.GetInt(HCIOffsetKey);
-
-        }
-        // SetGlobal が False のときは、プロジェクト内の設定ファイルから読み込み
-        else
-        {
-            HCICenter = EditorUserSettings.GetConfigValue(HCICenterKey) == "1";
-            string HCIOffsetStr = EditorUserSettings.GetConfigValue(HCIOffsetKey);
-            HCIOffset = HCIOffsetStr == null ? 0 : System.Int32.Parse(HCIOffsetStr);
-        }
     }
 
     // 設定を保存
     private static void SaveSettings()
     {
         EditorUserSettings.SetConfigValue(HCIEnabledKey, HCIEnabled ? "1" : "0");
-
-        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルに保存
-        if (SaveGlobal == true)
-        {
-            EditorPrefs.SetBool(HCICenterKey, HCICenter);
-            EditorPrefs.SetInt(HCIOffsetKey, HCIOffset);
-        }
-
-        // SetGlobal の値にかかわらず、プロジェクト内の設定ファイルにも保存
         EditorUserSettings.SetConfigValue(HCICenterKey, HCICenter ? "1" : "0");
         EditorUserSettings.SetConfigValue(HCIOffsetKey, HCIOffset.ToString());
+    }
+
+    // 他のプロジェクトと設定を共有
+    private static void SaveSettingsGlobal()
+    {
+        EditorPrefs.SetBool(HCICenterKey, HCICenter);
+        EditorPrefs.SetInt(HCIOffsetKey, HCIOffset);
+    }
+
+    private static void LoadSettingsGlobal()
+    {
+        HCICenter = EditorPrefs.GetBool(HCICenterKey);
+        HCIOffset = EditorPrefs.GetInt(HCIOffsetKey);
     }
 }

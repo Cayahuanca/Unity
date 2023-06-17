@@ -8,7 +8,6 @@ public static class ComponentIconDrawer
 {
     private static bool CIEnabled;
     private static bool AREnabled;
-    private static bool SaveGlobal;
     private static bool ForceEnglish;
     
     private static int ICON_SIZE = 14;
@@ -20,7 +19,6 @@ public static class ComponentIconDrawer
     private const string AREnabledKey = "Component_Icon_Align_Right";
     private const string CIIConsKey = "Component_Icon_Max_Icons";
     private const string CIOffsetKey = "Component_Icon_Offset";
-    private const string SaveGlobalKey = "Component_Icon_Global";
 
     private const string SettingPath = "Project/Praecipua/Hierarchy Component Icon";
 
@@ -125,7 +123,8 @@ public static class ComponentIconDrawer
             string AREnableText = "Align icon right.";
             string CIIConsText = "Increase the number of icons";
             string CIOffsetText = "Icon Offset";
-            string SaveGlobalText = "Apply Settings to all project";
+            string SaveGlobalText = "Save settings (shared with other project)";
+            string LoadGlobalText = "Load settings from shared settings.";
             
             if (ForceEnglish == false && lang == "ja-JP")
             {
@@ -133,7 +132,8 @@ public static class ComponentIconDrawer
                 AREnableText = "アイコンを右寄せにする";
                 CIIConsText = "アイコンの数を増やす";
                 CIOffsetText = "アイコンの位置を調整する";
-                SaveGlobalText = "全プロジェクトに配置を適用する";
+                SaveGlobalText = "他のプロジェクトと共通の設定ファイルに書き込む";
+                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
             }
 
             CIEnabled = EditorGUILayout.Toggle(CIEnableText, CIEnabled);
@@ -142,7 +142,15 @@ public static class ComponentIconDrawer
             CIICons = EditorGUILayout.IntField(CIIConsText, CIICons);
             CIOffset = EditorGUILayout.IntField(CIOffsetText, CIOffset);
 
-            SaveGlobal = EditorGUILayout.Toggle(SaveGlobalText, SaveGlobal);
+            if (GUILayout.Button(SaveGlobalText))
+            {
+                SaveSettingsGlobal();
+            }
+
+            if (GUILayout.Button(LoadGlobalText))
+            {
+                LoadSettingsGlobal();
+            }
 
             SaveSettings();
         }
@@ -153,54 +161,40 @@ public static class ComponentIconDrawer
     {
         CIEnabled = EditorUserSettings.GetConfigValue(CIEnabledKey) == "1";
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
+    
+        AREnabled = EditorUserSettings.GetConfigValue(AREnabledKey) == "1";
 
-        SaveGlobal = EditorPrefs.GetBool(SaveGlobalKey);
-        if (!SaveGlobal)
-        {
-            SaveGlobal = EditorUserSettings.GetConfigValue(SaveGlobalKey) == "1";
-        }
-        
-        //SaveGlobal が True のときは、全プロジェクト共通の設定ファイルから読み込み
-        if (SaveGlobal == true)
-        {
-            AREnabled = EditorPrefs.GetBool(AREnabledKey);
+        string CIIConstr = EditorUserSettings.GetConfigValue(CIIConsKey);
+        CIICons = CIIConstr == null ? 0 : System.Int32.Parse(CIIConstr);
 
-            CIICons = EditorPrefs.GetInt(CIIConsKey);
-            CIOffset = EditorPrefs.GetInt(CIOffsetKey);
-        }
-        // SaveGlobal が False のときは、プロジェクト内の設定ファイルから読み込み
-        else
-        {
-            AREnabled = EditorUserSettings.GetConfigValue(AREnabledKey) == "1";
-
-            string CIIConstr = EditorUserSettings.GetConfigValue(CIIConsKey);
-            CIICons = CIIConstr == null ? 0 : System.Int32.Parse(CIIConstr);
-
-            string CIOffsetStr = EditorUserSettings.GetConfigValue(CIOffsetKey);
-            CIOffset = CIOffsetStr == null ? 0 : System.Int32.Parse(CIOffsetStr);
-        }
+        string CIOffsetStr = EditorUserSettings.GetConfigValue(CIOffsetKey);
+        CIOffset = CIOffsetStr == null ? 0 : System.Int32.Parse(CIOffsetStr);
     }
 
     // 設定を保存
     private static void SaveSettings()
     {
-        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルに保存
-        if (SaveGlobal == true)
-        {
-            EditorPrefs.SetBool(AREnabledKey, AREnabled);
-
-            EditorPrefs.SetInt(CIIConsKey, CIICons);
-            EditorPrefs.SetInt(CIOffsetKey, CIOffset);
-        }
-
-        // SetGlobal の値にかかわらず、プロジェクト内の設定ファイルにも保存
         EditorUserSettings.SetConfigValue(CIEnabledKey, CIEnabled ? "1" : "0");
         EditorUserSettings.SetConfigValue(AREnabledKey, AREnabled ? "1" : "0");
 
         EditorUserSettings.SetConfigValue(CIIConsKey, CIICons.ToString());
         EditorUserSettings.SetConfigValue(CIOffsetKey, CIOffset.ToString());
-        
-        EditorUserSettings.SetConfigValue(SaveGlobalKey, SaveGlobal ? "1" : "0");
-        EditorPrefs.SetBool(SaveGlobalKey, SaveGlobal);
+    }
+
+    // 他のプロジェクトと設定を共有
+    private static void SaveSettingsGlobal()
+    {
+        EditorPrefs.SetBool(AREnabledKey, AREnabled);
+
+        EditorPrefs.SetInt(CIIConsKey, CIICons);
+        EditorPrefs.SetInt(CIOffsetKey, CIOffset);
+    }
+
+    private static void LoadSettingsGlobal()
+    {
+        AREnabled = EditorPrefs.GetBool(AREnabledKey);
+
+        CIICons = EditorPrefs.GetInt(CIIConsKey);
+        CIOffset = EditorPrefs.GetInt(CIOffsetKey);
     }
 }
