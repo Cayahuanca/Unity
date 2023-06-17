@@ -25,6 +25,8 @@ public class HierarchyLines : MonoBehaviour
             var middle = new Vector2(selectionRect.xMin - 22, selectionRect.yMin + selectionRect.height / 2);
             var toobj = new Vector2(selectionRect.xMin - 14, selectionRect.yMin + selectionRect.height / 2);
 
+            Handles.color = EditorGUIUtility.isProSkin ? new Color( 0.75f, 0.75f, 0.75f, 1.0f ) : new Color( 0.3f, 0.3f, 0.3f, 1.0f );
+
             // オブジェクトがさらに子を持つか
             if (objTransform.childCount == 0)
             {
@@ -65,7 +67,7 @@ public class HierarchyLines : MonoBehaviour
                 if (currentParent.parent != null && currentParent.GetSiblingIndex() != currentParent.parent.childCount - 1) {
                     var dotlinestart = new Vector2(selectionRect.xMin - 22 - i * 14, selectionRect.yMin);
                     var dotlineend = new Vector2(selectionRect.xMin - 22 - i * 14, selectionRect.yMax);
-                    Handles.DrawDottedLine(dotlinestart, dotlineend, 1);
+                    Handles.DrawDottedLine(dotlinestart, dotlineend, 0.5f);
                 }
             }
             Handles.EndGUI();
