@@ -7,12 +7,14 @@ using System.Globalization;
 public class ObjectActivationToggle
 {
     private static bool HOAEnabled;
+    private static bool SaveGlobal;
+    private static bool ForceEnglish;
 
     private static int HOAOffset;
     
     private const string HOAEnabledKey = "Hierarchy_Object_Icon_Enabled";
     private const string HOAOffsetKey = "Hierarchy_Object_Icon_Offset";
-    private static bool ForceEnglish;
+    private const string SaveGlobalKey = "Hierarchy_Custom_Icon_Global";
 
     static ObjectActivationToggle()
     {
@@ -40,6 +42,7 @@ public class ObjectActivationToggle
         EditorGUI.BeginChangeCheck();
 
         bool active = GUI.Toggle(rect, GameObject.activeSelf, "");
+
 
         if (active != GameObject.activeSelf)
         {
@@ -82,15 +85,18 @@ public class ObjectActivationToggle
 
             string HOAEnableText = "Enable Hierarchy Object Active";
             string HOAOffsetText = "Icon Offset";
+            string SaveGlobalText = "Apply positions to all project";
             
             if (ForceEnglish == false && lang == "ja-JP")
             {
                 HOAEnableText = "Hierarchy Object Active を有効にする";
                 HOAOffsetText = "アイコンの位置を調整する";
+                SaveGlobalText = "全プロジェクトに配置を適用する";
             }
             
             HOAEnabled = EditorGUILayout.Toggle(HOAEnableText, HOAEnabled);
             HOAOffset = EditorGUILayout.IntField(HOAOffsetText, HOAOffset);
+            SaveGlobal = EditorGUILayout.Toggle(SaveGlobalText, SaveGlobal);
 
             SaveSettings();
         }
@@ -100,15 +106,37 @@ public class ObjectActivationToggle
     private static void LoadSettings()
     {
         HOAEnabled = EditorUserSettings.GetConfigValue(HOAEnabledKey) == "1";
-        string HOAOffsetStr = EditorUserSettings.GetConfigValue(HOAOffsetKey);
-        HOAOffset = HOAOffsetStr == null ? 0 : System.Int32.Parse(HOAOffsetStr);
 
+        SaveGlobal = EditorPrefs.GetBool(SaveGlobalKey);
+        if (!SaveGlobal)
+        {
+            SaveGlobal = EditorUserSettings.GetConfigValue(SaveGlobalKey) == "1";
+        }
         ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
+
+        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルから読み込み
+        if (SaveGlobal == true)
+        {
+            HOAOffset = EditorPrefs.GetInt(HOAOffsetKey);
+        }
+        // SetGlobal が False のときは、プロジェクト内の設定ファイルから読み込み
+        else
+        {
+            string HOAOffsetStr = EditorUserSettings.GetConfigValue(HOAOffsetKey);
+            HOAOffset = HOAOffsetStr == null ? 0 : System.Int32.Parse(HOAOffsetStr);
+        }
     }
 
     // 設定を保存
     private static void SaveSettings()
     {
+        // SetGlobal が True のときは、全プロジェクト共通の設定ファイルに保存
+        if (SaveGlobal == true)
+        {
+            EditorPrefs.SetInt(HOAOffsetKey, HOAOffset);
+
+        }
+        // SetGlobal の値にかかわらず、プロジェクト内の設定ファイルにも保存
         EditorUserSettings.SetConfigValue(HOAEnabledKey, HOAEnabled ? "1" : "0");
         EditorUserSettings.SetConfigValue(HOAOffsetKey, HOAOffset.ToString());
     }

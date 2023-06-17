@@ -27,6 +27,12 @@ public class PolygonCounter : Editor
         if (mesh != null)
         {
             EditorGUILayout.LabelField(PolygonText, (mesh.triangles.Length / 3).ToString());
+
+            // Debug.Log(PolygonText + (mesh.triangles.Length / 3).ToString());
+        }
+        else
+        {
+            EditorGUILayout.LabelField(PolygonText, "null");
         }
 
         base.OnInspectorGUI();

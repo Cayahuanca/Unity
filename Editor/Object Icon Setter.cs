@@ -24,6 +24,12 @@ public class IconSetter : EditorWindow
     {
         GetWindow<IconSetter>("Icon Setter");
     }
+    [MenuItem("GameObject/Object Icon Setter", false, 20)]
+    public static void ShowWindow2()
+    {
+        GetWindow<IconSetter>("Icon Setter");
+    }
+
 
 public static class GUILayoutEx
     {
