@@ -14,8 +14,12 @@ public class FileInfoWindow : EditorWindow
         Repaint();
     }
 
+    private Vector2 scrollPos;
+
     private void OnGUI()
     {
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
         foreach (var obj in Selection.objects)
         {
             string path = AssetDatabase.GetAssetPath(obj);
@@ -34,6 +38,9 @@ public class FileInfoWindow : EditorWindow
                 order++;
                 length = length / 1024;
             }
+
+            string projectPath = Application.dataPath.Substring(0, Application.dataPath.Length - 6);
+
 
             string result = string.Format("{0:0.##} {1}", length, sizes[order]);
 
@@ -62,7 +69,14 @@ public class FileInfoWindow : EditorWindow
             EditorGUILayout.TextField(path);
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Full Path: ");
+            EditorGUILayout.TextField(projectPath + path);
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space();
         }
+
+        EditorGUILayout.EndScrollView();
     }
 }

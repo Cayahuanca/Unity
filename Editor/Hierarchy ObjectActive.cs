@@ -4,15 +4,15 @@ using UnityEditor;
 public static class HierarchyGUI
 {
     private const int WIDTH = 16;
-    private const int OFFSET = 10;
+    private const int OFFSET = 0;
 
     [InitializeOnLoadMethod]
     private static void Initialize()
     {
-        EditorApplication.hierarchyWindowItemOnGUI += OnGUI;
+        EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
     }
     
-    private static void OnGUI(int instanceID, Rect selectionRect)
+    private static void HierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {
         var go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
         if (go == null)
