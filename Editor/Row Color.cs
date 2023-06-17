@@ -9,28 +9,13 @@ internal static class RowColor
 
     private static bool EnabledInProjectWindow = true;
     private static bool EnabledInHierarchyWindow = true;
-    private static Color Color = new Color( 0, 0, 0, 0.08f );
+    private static Color ColorInProject = new Color( 0, 0, 0, 0.08f );
+    private static Color ColorInHierarchy = new Color( 0, 0, 0, 0.08f );
 
     static RowColor()
     {
         EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
         EditorApplication.projectWindowItemOnGUI += ProjectWindowItemOnGUI;
-    }
-
-    private static void HierarchyWindowItemOnGUI( int instanceID, Rect rect )
-    {
-        if (!EnabledInHierarchyWindow) return;
-
-        var index = ( int ) ( rect.y + OFFSET_Y ) / ROW_HEIGHT;
-
-        if ( index % 2 == 0 ) return;
-
-        var xMax = rect.xMax;
-
-        rect.x    = 32;
-        rect.xMax = xMax + 16;
-
-        EditorGUI.DrawRect( rect, Color );
     }
 
     private static void ProjectWindowItemOnGUI(string guid, Rect rect)
@@ -46,14 +31,33 @@ internal static class RowColor
         rect.x    = 32;
         rect.xMax = xMax + 16;
 
-        EditorGUI.DrawRect( rect, Color );
+        EditorGUI.DrawRect( rect, ColorInProject );
     }
 
-    [PreferenceItem("Hierarchy Customization")]
-    private static void OnPreferencesGUI()
+    private static void HierarchyWindowItemOnGUI( int instanceID, Rect rect )
+    {
+        if (!EnabledInHierarchyWindow) return;
+
+        var index = ( int ) ( rect.y + OFFSET_Y ) / ROW_HEIGHT;
+
+        if ( index % 2 == 0 ) return;
+
+        var xMax = rect.xMax;
+
+        rect.x    = 32;
+        rect.xMax = xMax + 16;
+
+        EditorGUI.DrawRect( rect, ColorInHierarchy );
+    }
+
+    /*[PreferenceItem("Hierarchy Customization")] */
+    [PreferenceItem("Praecipua/Row Color")]
+    private static void OnPreferences()
     {
         EnabledInHierarchyWindow = EditorGUILayout.Toggle("Enabled in Hierarchy Window", EnabledInHierarchyWindow);
+        ColorInHierarchy = EditorGUILayout.ColorField("Hierarchy Background Color", ColorInHierarchy);
+
         EnabledInProjectWindow = EditorGUILayout.Toggle("Enabled in Project Window", EnabledInProjectWindow);
-        Color = EditorGUILayout.ColorField("Background Color", Color);
+        ColorInProject = EditorGUILayout.ColorField("Project Background Color", ColorInProject);
     }
 }

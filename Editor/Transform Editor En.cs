@@ -3,42 +3,97 @@ using UnityEditor;
 
 [CustomEditor(typeof(Transform))]
 public class TransformEditorEn : Editor
-{
+{   
+    private bool isWorldPositionEditable = false;
+    private static bool EnabledInHierarchyWindow = true;
+    private static bool LanguageInHierarchyWindow = false;
+
+    private static string TransformEditorEnable = "Transform Editor Enabled";
+    
     public override void OnInspectorGUI()
     {
         Transform transform = (Transform)target;
 
-        /* EditorGUILayout.LabelField("Relative Position", transform.localPosition.ToString()); */
-        transform.localPosition = EditorGUILayout.Vector3Field("Relative Position", transform.localPosition);
+        TransformEditorEnable = "Transform Editor Enabled";
+        string toggleText = "Edit World Position";
+        string toggleDescription = "Using World Position may cause the numbers to continuously change.";
+        string localPositionLabel = "Position (Local)";
+        string worldPositionLabel = "Position (World)";
+        string localRotationLabel = "Rotation (Local)";
+        string worldRotationLabel = "Rotation (World)";
+        string localScaleLabel = "Scale (Local)";
+        string worldScaleLabel = "Scale (World)";
 
-        /* EditorGUILayout.LabelField("Absolute Position", transform.position.ToString()); */
-        transform.position = EditorGUILayout.Vector3Field("Absolute Position", transform.position);
+        if (LanguageInHierarchyWindow)
+        {
+            TransformEditorEnable = "Transform Editor を有効にする";
+            toggleText = "ワールド座標を編集";
+            toggleDescription = "ワールド座標を使用すると、数値が入力していないときに変動し続ける場合があります。";
+            localPositionLabel = "座標 (ローカル)";
+            worldPositionLabel = "座標 (ワールド)";
+            localRotationLabel = "回転 (ローカル)";
+            worldRotationLabel = "回転 (ワールド)";
+            localScaleLabel = "スケール (ローカル)";
+            worldScaleLabel = "スケール (ワールド)";
+        }
 
-        EditorGUILayout.LabelField("");
+        if (EnabledInHierarchyWindow)
+        {
+            isWorldPositionEditable = EditorGUILayout.Toggle(toggleText, isWorldPositionEditable);
+            EditorGUILayout.LabelField(toggleDescription);
 
-        /* EditorGUILayout.LabelField("Relative Rotation", transform.localRotation.eulerAngles.ToString()); */
-        transform.localRotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Relative Rotation", transform.localRotation.eulerAngles));
+            if (!isWorldPositionEditable)
+            {
+                transform.localPosition = EditorGUILayout.Vector3Field(localPositionLabel, transform.localPosition);
+                EditorGUILayout.LabelField(worldPositionLabel, transform.position.ToString());
+            }
+            else
+            {
+                transform.localPosition = EditorGUILayout.Vector3Field(localPositionLabel, transform.localPosition);
+                transform.position = EditorGUILayout.Vector3Field(worldPositionLabel, transform.position);
+            }
 
-        /* EditorGUILayout.LabelField("Absolute Rotation", transform.rotation.eulerAngles.ToString()); */
-        transform.rotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Absolute Rotation", transform.rotation.eulerAngles));
+            EditorGUILayout.LabelField("");
 
-        EditorGUILayout.LabelField("");
-        
-        /* EditorGUILayout.LabelField("Relative Scale", transform.localScale.ToString()); */
-        transform.localScale = EditorGUILayout.Vector3Field("Relative Scale", transform.localScale);
+            transform.localRotation = Quaternion.Euler(EditorGUILayout.Vector3Field(localRotationLabel, transform.localRotation.eulerAngles));
 
-        EditorGUILayout.LabelField("Absolute Scale", GetAbsoluteScale(transform).ToString());
+            transform.rotation = Quaternion.Euler(EditorGUILayout.Vector3Field(worldRotationLabel, transform.rotation.eulerAngles));
+
+            EditorGUILayout.LabelField("");
+
+            transform.localScale = EditorGUILayout.Vector3Field(localScaleLabel, transform.localScale);
+
+            EditorGUILayout.LabelField(worldScaleLabel, GetAbsoluteScale(transform).ToString());
+        }
+        else
+        {
+            /* DrawDefaultInspector(); を使用すると、Rotation に W 欄が追加され、表示がおかしくなるため、デフォルトと同様のものを以下のコードで再現しています。*/
+            transform.localPosition = EditorGUILayout.Vector3Field("Position", transform.localPosition);
+            transform.localRotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Rotation", transform.localRotation.eulerAngles));
+            transform.localScale = EditorGUILayout.Vector3Field("Scale", transform.localScale);
+        }
     }
 
     private Vector3 GetAbsoluteScale(Transform transform)
     {
-        Vector3 absoluteScale = transform.localScale;
-        Transform parent = transform.parent;
-        while (parent != null)
         {
-            absoluteScale = Vector3.Scale(absoluteScale, parent.localScale);
-            parent = parent.parent;
+            Vector3 absoluteScale = transform.localScale;
+            Transform parent = transform.parent;
+            while (parent != null)
+            {
+                absoluteScale = Vector3.Scale(absoluteScale, parent.localScale);
+                parent = parent.parent;
+            }
+            return absoluteScale;
         }
-        return absoluteScale;
+
+    }
+
+    [PreferenceItem("Praecipua/Transform Editor")]
+    private static void OnPreferences()
+    {
+        EditorGUILayout.LabelField("Transform Editor");
+        EnabledInHierarchyWindow = EditorGUILayout.Toggle(TransformEditorEnable, EnabledInHierarchyWindow);
+        LanguageInHierarchyWindow = EditorGUILayout.Toggle("English / Japanese", LanguageInHierarchyWindow);
     }
 }

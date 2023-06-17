@@ -1,37 +1,28 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public static class HierarchyGUI
+[InitializeOnLoad]
+public class ObjectActivationToggle
 {
-    private const int WIDTH = 16;
-    private const int OFFSET = 0;
-
-    [InitializeOnLoadMethod]
-    private static void Initialize()
+    static ObjectActivationToggle()
     {
-        EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
+        EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
     }
-    
-    private static void HierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
+
+    private static void OnHierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {
-        var go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-        if (go == null)
+        GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+        if (gameObject == null)
         {
             return;
         }
 
-        var pos = selectionRect;
-        pos.x = pos.xMax - OFFSET;
-        pos.width = WIDTH;
+        Rect toggleRect = new Rect(selectionRect.xMax, selectionRect.yMin, 15, 15);
+        bool active = GUI.Toggle(toggleRect, gameObject.activeSelf, "");
 
-        bool active = GUI.Toggle(pos, go.activeSelf, string.Empty);
-        if (active == go.activeSelf)
+        if (active != gameObject.activeSelf)
         {
-            return;
+            gameObject.SetActive(active);
         }
-
-        Undo.RecordObject(go, $"{(active ? "Activate" : "Deactivate")} GameObject '{go.name}'");
-        go.SetActive(active);
-        EditorUtility.SetDirty(go);
     }
 }
