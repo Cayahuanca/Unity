@@ -69,6 +69,17 @@ public class GameObjectIconWindow : EditorWindow
                 }
                 GUILayout.EndHorizontal();
             }
+
+            GUILayout.Space(20);
+
+            if (GUILayout.Button("Reset Icon"))
+            {
+                foreach (var selectedGameObject in selectedGameObjects)
+                {
+                    ResetIcon(selectedGameObject);
+                }
+                Close();
+            }
         }
         else
         {
@@ -83,11 +94,18 @@ public class GameObjectIconWindow : EditorWindow
 
         if (icon != null && selectedGameObject != null)
         {
-            var iconGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(icon));
             var serializedObject = new SerializedObject(selectedGameObject);
             var iconProperty = serializedObject.FindProperty("m_Icon");
             iconProperty.objectReferenceValue = AssetDatabase.LoadAssetAtPath(iconPath, typeof(Texture2D));
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
+    }
+
+    private void ResetIcon(GameObject selectedGameObject)
+    {
+        var serializedObject = new SerializedObject(selectedGameObject);
+        var iconProperty = serializedObject.FindProperty("m_Icon");
+        iconProperty.objectReferenceValue = null;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
     }
 }
