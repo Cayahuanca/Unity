@@ -5,13 +5,10 @@
     "version": "6.0.0-beta.11",
     "author": "Praecipua",
     "unity": "2019.4",
-    "keywords": [
-        "extension",
-        "praecipua"
-    ],
+    "keywords": ["extension", "praecipua"],
     "license": "Apache-2.0",
     "repository": {
     "type": "git",
-    "url": "https://github.com/Cayahualla/Unity.git"
+    "url": "https://github.com/Cayahualla/Unity.git?path=Packages#upm"
     }
 }
