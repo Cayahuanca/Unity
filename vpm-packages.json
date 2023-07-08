@@ -8,7 +8,7 @@
             "versions": {
                 "6.0.0-beta.11": {
                     "name": "org.praecipua.ee",
-                    "version": "6.0.0-beta.12",
+                    "version": "6.0.0-beta.11",
                     "displayName": "Praecipua Editor Enhancer",
                     "description": "Editor Extension Package",
                     "unity": "2019.4",
