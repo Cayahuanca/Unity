@@ -1,4 +1,8 @@
 {
+    "author": "Praecipua",
+    "name": "Praecipua",
+    "id": "org.praecipua.vpm",
+    "url": "https://raw.githubusercontent.com/Cayahuanca/Unity/main/vpm-packages.json",
     "packages": {
         "org.praecipua.ee": {
             "versions": {
