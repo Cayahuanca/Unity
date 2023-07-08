@@ -72,12 +72,12 @@ namespace Praecipua.EE
 	                }
 
 	                // ワールド座標を表示
-	                EditorGUILayout.LabelField(worldPositionLabel, LocalPosition.ToString("F4"));
+	                EditorGUILayout.LabelField(worldPositionLabel, WorldPosition.ToString("F4"));
 	            }
 	            else
 	            {
 	                // ローカル座標を表示
-	                EditorGUILayout.LabelField(localPositionLabel, WorldPosition.ToString("F4"));
+	                EditorGUILayout.LabelField(localPositionLabel, LocalPosition.ToString("F4"));
 
 	                // ワールド座標を編集
 	                EditorGUI.BeginChangeCheck();

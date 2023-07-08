@@ -2,13 +2,16 @@
     "name": "org.praecipua.ee",
     "displayName": "Praecipua Editor Enhancer",
     "description": "Editor Extension Package",
-    "version": "6.0.0-beta.11",
+    "version": "6.0.0-beta.12",
     "author": "Praecipua",
     "unity": "2019.4",
     "keywords": ["extension", "praecipua"],
+    "documentationUrl": "https://github.com/Cayahuanca/Unity/blob/main/howtouse.pdf",
+    "changelogUrl": "https://github.com/Cayahuanca/Unity/commits/main",
     "license": "Apache-2.0",
+    "licensesUrl": "https://github.com/Cayahuanca/Unity/blob/main/LICENSE",
     "repository": {
     "type": "git",
-    "url": "https://github.com/Cayahualla/Unity.git?path=Packages#upm"
+    "url": "https://github.com/Cayahualla/Unity.git?path=Packages#main"
     }
 }

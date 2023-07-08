@@ -74,6 +74,10 @@ Almost of them were made for personal use and has not been verified in other env
 
 [Check out this PDF for instructions on how to do it. (Japanese Only)](howtouse.pdf)
 
+[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4523837)
+
+[VRChat Creator Companion Setup](vcc://vpm/addRepo?url=https://raw.githubusercontent.com/Cayahuanca/Unity/main/vpm-packages.json)
+
 ## 2. Face Camera
 
 This is a shader for checking the expression of your avatar in VRChat.
@@ -83,6 +87,8 @@ It is not visible to others, nor does it appear in his VRCMirror or VRCCamera, w
 これは、VRChat で、自身のアバターの表情を確認するためのシェーダーです。
 
 他人からは見えず、reserved2 をオフにしていない VRCMirror や、VRCCamera にも映りません。
+
+[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4409754)
 
 ![FaceCamera](/Readme/FaceCamera.png)
 
@@ -105,5 +111,7 @@ If an animation is created, it may be possible to link facial expressions.
 頭に仕込むことで、頭から脳みその代わりにメロンパンを引っ張り出すことができます。
 
 アニメーションを作れば、表情を連動させることも可能でしょう。
+
+[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4373950)
 
 ![Melon](/Readme/Melon.png)
