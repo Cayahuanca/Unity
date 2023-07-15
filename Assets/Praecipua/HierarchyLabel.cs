@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Globalization;
 
-namespace Praecipua.EE
+namespace Praecipua.EE.RT
 {
 	public class HierarchyLabel : MonoBehaviour
 	{

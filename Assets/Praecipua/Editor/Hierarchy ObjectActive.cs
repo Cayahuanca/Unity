@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 using System.Globalization;
+using Praecipua.EE.RT;
 
 namespace Praecipua.EE
 {	
@@ -40,7 +41,6 @@ namespace Praecipua.EE
 	
 	        if (HOAEnabled)
 	        {
-	            //HierarchyLabel HierarchyLabelScript = GameObject.GetComponent<HierarchyLabel>();
 	            if (GameObject.GetComponent<HierarchyLabel>() != null) return;
 	
 	            if (Event.current.alt && GUI.Toggle(rect, false, "") && Selection.gameObjects.Length > 1)

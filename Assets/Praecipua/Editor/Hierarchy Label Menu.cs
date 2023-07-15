@@ -1,6 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using Praecipua.EE;
+using Praecipua.EE.RT;
+
 namespace Praecipua.EE
 {
 	public class HierarchyLabelMenu
