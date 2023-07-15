@@ -1,11 +1,7 @@
 {
-    "name": "Praecipua.EE",
-    "references": [
-        "GUID:c18ba47f39395d843b722b72b32f11a7"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "name": "Praecipua.EE.RT",
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
