@@ -10,7 +10,7 @@ namespace Praecipua.EE
 	    private Texture2D[] icons;
 	    private int selectedIconIndex;
 	
-	    private const string iconFolderPath = "Packages/org.praecipua.ee/Icons/Quick/";
+	    private const string iconFolderPath = "Assets/Praecipua/Icons/Quick/";
 	
 	    [MenuItem("GameObject/Quick Icon", false, 20)]
 	    private static void ShowWindow()

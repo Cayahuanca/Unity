@@ -107,7 +107,7 @@ namespace Praecipua.EE
 	        Texture2D[] icons = new Texture2D[0];
 	        if(IconMode == 0)
 	        {
-	            folderPath = "Packages/org.praecipua.ee/Icons";
+	            folderPath = "Assets/Praecipua/Icons";
 	            if (!Directory.Exists(folderPath))
 	            {
 	                Directory.CreateDirectory(folderPath);
@@ -120,26 +120,32 @@ namespace Praecipua.EE
 
 	        else if(IconMode == 1)
 	        {
-	            string iconFolder = "Packages/org.praecipua.ee/Icons/Unity";
-	            if (!Directory.Exists(iconFolder))
+	            string[] iconFolders = { "Assets/Praecipua/Icons/Unity", "Assets/Praecipua/UnityIcons/1", "Assets/Praecipua/UnityIcons/2" };
+	            foreach (string iconFolders1 in iconFolders)
 	            {
-	                Directory.CreateDirectory(iconFolder);
-	                AssetDatabase.Refresh();
+	                if (!Directory.Exists(iconFolders1))
+	                {
+	                    Directory.CreateDirectory(iconFolders1);
+	                    AssetDatabase.Refresh();
+	                }
 	            }
-	        	List<string> iconsPathsList = new List<string>();
+	            List<string> iconsPathsList = new List<string>();
 
-	        	string[] paths = AssetDatabase.FindAssets("t:Texture2D", new[] {iconFolder})
-	                                    	.Select(AssetDatabase.GUIDToAssetPath)
-	                                    	.ToArray();
-	            	iconsPathsList.AddRange(paths);
+	            foreach (string iconFolder in iconFolders)
+	            {
+	                string[] paths = AssetDatabase.FindAssets("t:Texture2D", new[] {iconFolder})
+	                                            .Select(AssetDatabase.GUIDToAssetPath)
+	                                            .ToArray();
+	                iconsPathsList.AddRange(paths);
+	            }
 
-	    		string[] iconsPaths = iconsPathsList.ToArray();
-	    		icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
+	            string[] iconsPaths = iconsPathsList.ToArray();
+	            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
 			}
 
 	        else if(IconMode == 2)
 	        {
-	            folderPath = "Packages/org.praecipua.ee/Icons/1";
+	            folderPath = "Assets/Praecipua/Icons/1";
 	            if (!Directory.Exists(folderPath))
 	            {
 	                Directory.CreateDirectory(folderPath);
@@ -152,7 +158,7 @@ namespace Praecipua.EE
 
 	        else if(IconMode == 3)
 	        {
-	            folderPath = "Packages/org.praecipua.ee/Icons/2";
+	            folderPath = "Assets/Praecipua/Icons/2";
 	            if (!Directory.Exists(folderPath))
 	            {
 	                Directory.CreateDirectory(folderPath);
@@ -165,7 +171,7 @@ namespace Praecipua.EE
 
 	        else if(IconMode == 4)
 	        {
-	            folderPath = "Packages/org.praecipua.ee/Icons/3";
+	            folderPath = "Assets/Praecipua/Icons/3";
 	            if (!Directory.Exists(folderPath))
 	            {
 	                Directory.CreateDirectory(folderPath);
@@ -314,7 +320,7 @@ namespace Praecipua.EE
 	    private static void WriteIcon()
 	    {
 	        // 保存先のフォルダパス
-	        string folderPath = "Packages/org.praecipua.ee/Icons/Unity";
+	        string folderPath = "Assets/Praecipua/Icons/Unity";
 	        // フォルダがなければ作成
 	        if (!Directory.Exists(folderPath))
 	        {
@@ -363,7 +369,7 @@ namespace Praecipua.EE
 	    private static void WriteIcon2()
 	    {
 	        // 保存先のフォルダパス
-	        string folderPath = "Packages/org.praecipua.ee/Icons/Unity";
+	        string folderPath = "Assets/Praecipua/Icons/Unity";
 	        // フォルダがなければ作成
 	        if (!Directory.Exists(folderPath))
 	        {
