@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Praecipua.EE
 {
-	public class QuickIconWindowUPM : EditorWindow
+	public class QuickIconWindow : EditorWindow
 	{
 	    private GameObject[] selectedGameObjects;
 	    private Texture2D[] icons;
@@ -18,7 +18,7 @@ namespace Praecipua.EE
 	        var selectedGameObjects = Selection.gameObjects;
 	        if (selectedGameObjects != null && selectedGameObjects.Length > 0)
 	        {
-	            var window = GetWindow<QuickIconWindowUPM>();
+	            var window = GetWindow<QuickIconWindow>();
 	            window.titleContent = new GUIContent("Quick Icon");
 	            window.Show();
 	        }

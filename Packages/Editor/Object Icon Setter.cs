@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Praecipua.EE
 {
-	public class IconSetterUPM : EditorWindow
+	public class IconSetter : EditorWindow
 	{
 	    private static bool ForceEnglish;
 	    private int IconMode = 1;
@@ -22,13 +22,13 @@ namespace Praecipua.EE
 	    [MenuItem("Window/Object Icon Setter")]
 	    public static void ShowWindow()
 	    {
-	        GetWindow<IconSetterUPM>("Icon Setter");
+	        GetWindow<IconSetter>("Icon Setter");
 	    }
 
 	    [MenuItem("GameObject/Object Icon Setter", false, 20)]
 	    public static void ShowWindow2()
 	    {
-	        IconSetterUPM window = GetWindow<IconSetterUPM>("Icon Setter");
+	        IconSetter window = GetWindow<IconSetter>("Icon Setter");
 
 	        // 選択された GameObject を取得し、objectCount に代入する
 	        GameObject[] selectedObjects = Selection.gameObjects;

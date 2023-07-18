@@ -10,10 +10,8 @@ namespace Praecipua.EE
 	public class IconSetter : EditorWindow
 	{
 	    private static bool ForceEnglish;
-
 	    private int IconMode = 1;
 	    private int objectCount = 1;
-
 	    private string searchText = "";
 
 	    private GameObject[] targetObjects = new GameObject[1];
@@ -26,6 +24,7 @@ namespace Praecipua.EE
 	    {
 	        GetWindow<IconSetter>("Icon Setter");
 	    }
+
 	    [MenuItem("GameObject/Object Icon Setter", false, 20)]
 	    public static void ShowWindow2()
 	    {
@@ -46,7 +45,7 @@ namespace Praecipua.EE
 	    }
 
 
-	public static class GUILayoutEx
+		public static class GUILayoutEx
 	    {
 	        public static GUILayoutOption[] GetOptionsForIconSelection(Texture2D[] textures)
 	        {
@@ -121,7 +120,7 @@ namespace Praecipua.EE
 
 	        else if(IconMode == 1)
 	        {
-	            string[] iconFolders = { "Assets/Praecipua/UnityIcons/1", "Assets/Praecipua/UnityIcons/2" };
+	            string[] iconFolders = { "Assets/Praecipua/Icons/Unity", "Assets/Praecipua/UnityIcons/1", "Assets/Praecipua/UnityIcons/2" };
 	            foreach (string iconFolders1 in iconFolders)
 	            {
 	                if (!Directory.Exists(iconFolders1))
@@ -142,7 +141,7 @@ namespace Praecipua.EE
 
 	            string[] iconsPaths = iconsPathsList.ToArray();
 	            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
-	        }
+			}
 
 	        else if(IconMode == 2)
 	        {
@@ -321,7 +320,7 @@ namespace Praecipua.EE
 	    private static void WriteIcon()
 	    {
 	        // 保存先のフォルダパス
-	        string folderPath = "Assets/Praecipua/UnityIcons/1";
+	        string folderPath = "Assets/Praecipua/Icons/Unity";
 	        // フォルダがなければ作成
 	        if (!Directory.Exists(folderPath))
 	        {
@@ -370,7 +369,7 @@ namespace Praecipua.EE
 	    private static void WriteIcon2()
 	    {
 	        // 保存先のフォルダパス
-	        string folderPath = "Assets/Praecipua/UnityIcons/2";
+	        string folderPath = "Assets/Praecipua/Icons/Unity";
 	        // フォルダがなければ作成
 	        if (!Directory.Exists(folderPath))
 	        {
