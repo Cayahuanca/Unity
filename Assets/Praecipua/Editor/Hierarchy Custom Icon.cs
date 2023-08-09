@@ -110,9 +110,20 @@ namespace Praecipua.EE
 	                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
 	            }
 
-	            HCIEnabled = EditorGUILayout.Toggle(HCIEnableText, HCIEnabled);
-	            HCICenter = EditorGUILayout.Toggle(HCICenterText, HCICenter);
-	            HCIOffset = EditorGUILayout.IntField(HCIOffsetText, HCIOffset);
+				EditorGUILayout.BeginHorizontal();
+	            	HCIEnabled = EditorGUILayout.Toggle(HCIEnabled, GUILayout.Width(30));
+					EditorGUILayout.LabelField(HCIEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.BeginHorizontal();
+					HCICenter = EditorGUILayout.Toggle(HCICenter, GUILayout.Width(30));
+					EditorGUILayout.LabelField(HCICenterText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.BeginHorizontal();
+	            	HCIOffset = EditorGUILayout.IntField(HCIOffset, GUILayout.Width(30));
+					EditorGUILayout.LabelField(HCIOffsetText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 
 	            if (GUILayout.Button(SaveGlobalText))
 	            {

@@ -125,11 +125,25 @@ namespace Praecipua.EE
 	                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
 	            }
 	
-	            RCHEnabled = EditorGUILayout.Toggle(RCHEnableText, RCHEnabled);
-	            HierarchyColor = EditorGUILayout.ColorField(RCHColorText, HierarchyColor);
+				EditorGUILayout.BeginHorizontal();
+	            	RCHEnabled = EditorGUILayout.Toggle(RCHEnabled, GUILayout.Width(50));
+					EditorGUILayout.LabelField(RCHEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+
+	            EditorGUILayout.BeginHorizontal();
+					HierarchyColor = EditorGUILayout.ColorField(HierarchyColor, GUILayout.Width(50));
+					EditorGUILayout.LabelField(RCHColorText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 	
-	            RCPEnabled = EditorGUILayout.Toggle(RCPEnableText, RCPEnabled);
-	            ProjectColor = EditorGUILayout.ColorField(RCPColorText, ProjectColor);
+	            EditorGUILayout.BeginHorizontal();
+					RCPEnabled = EditorGUILayout.Toggle(RCPEnabled, GUILayout.Width(50));
+					EditorGUILayout.LabelField(RCPEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.BeginHorizontal();
+	            	ProjectColor = EditorGUILayout.ColorField(ProjectColor, GUILayout.Width(50));
+					EditorGUILayout.LabelField(RCPColorText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 	            
 	            if (GUILayout.Button(SaveGlobalText))
 	            {

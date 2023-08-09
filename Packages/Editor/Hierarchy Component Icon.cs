@@ -140,11 +140,25 @@ namespace Praecipua.EE
 	                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
 	            }
 
-	            CIEnabled = EditorGUILayout.Toggle(CIEnableText, CIEnabled);
-	            AREnabled = EditorGUILayout.Toggle(AREnableText, AREnabled);
+				EditorGUILayout.BeginHorizontal();;
+	            	CIEnabled = EditorGUILayout.Toggle(CIEnabled, GUILayout.Width(30));
+					EditorGUILayout.LabelField(CIEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 
-	            CIICons = EditorGUILayout.IntField(CIIConsText, CIICons);
-	            CIOffset = EditorGUILayout.IntField(CIOffsetText, CIOffset);
+				EditorGUILayout.BeginHorizontal();
+	            	AREnabled = EditorGUILayout.Toggle(AREnabled, GUILayout.Width(30));
+					EditorGUILayout.LabelField(AREnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.BeginHorizontal();
+	            	CIICons = EditorGUILayout.IntField(CIICons, GUILayout.Width(30));
+					EditorGUILayout.LabelField(CIIConsText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+				
+				EditorGUILayout.BeginHorizontal();
+	            	CIOffset = EditorGUILayout.IntField(CIOffset, GUILayout.Width(30));
+					EditorGUILayout.LabelField(CIOffsetText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 
 	            if (GUILayout.Button(SaveGlobalText))
 	            {

@@ -27,27 +27,19 @@ namespace Praecipua.EE
 	    public override void OnGUI(string searchContext)
 	    {
 	        EditorGUILayout.LabelField("ここで、キーを削除する前に、そのキーを使用するエディタ拡張のファイルを削除してください。");
-	        EditorGUILayout.LabelField("基本的には、/Assets/Praecipua/(エディタ拡張名).cs に保存されています。");
+			EditorGUILayout.LabelField("Unitypackage 版では、/Assets/Praecipua/Editor/エディタ拡張名).cs に保存されています。");
+	        EditorGUILayout.LabelField("UPM や VPM 版では、/Packages/org.praecipua.ee/Editor/エディタ拡張名).cs に保存されています。");
 	        EditorGUILayout.Space();
-	        EditorGUILayout.LabelField("なお、この画面からは、この PC で開く Unity のプロジェクト全てに適用される設定のみ消去します。");
-	        EditorGUILayout.LabelField("このプロジェクト内のみの設定は、この画面からは消去できません。");
+	        EditorGUILayout.LabelField("この画面からは、他のプロジェクトと共通の設定ファイルの設定のみ消去します。");
+	        EditorGUILayout.LabelField("このプロジェクト内のみの設定は、消去できません。");
 	        EditorGUILayout.Space();
 
-	    // Component Icon
-	        EditorGUILayout.LabelField("Component Icon が使用するキー");
-	        string CIEnabledKey = "Component_Icon_Enabled";
+	    // Hierarchy Component Icon
+	        EditorGUILayout.LabelField("Hierarchy Component Icon が使用するキー");
 	        string AREnabledKey = "Component_Icon_Align_Right";
 	        string CIIConsKey = "Component_Icon_Max_Icons";
 	        string CIOffsetKey = "Component_Icon_Offset";
-	        string CIGlobalKey = "Component_Icon_Global";
 
-	        if (GUILayout.Button("Delete " + CIEnabledKey))
-	        {
-	            if (EditorPrefs.HasKey(CIEnabledKey))
-	            {
-	                EditorPrefs.DeleteKey(CIEnabledKey);
-	            }
-	        }
 	        if (GUILayout.Button("Delete " + AREnabledKey))
 	        {
 	            if (EditorPrefs.HasKey(AREnabledKey))
@@ -69,20 +61,9 @@ namespace Praecipua.EE
 	                EditorPrefs.DeleteKey(CIOffsetKey);
 	            }
 	        }
-	        if (GUILayout.Button("Delete " + CIGlobalKey))
-	        {
-	            if (EditorPrefs.HasKey(CIGlobalKey))
-	            {
-	                EditorPrefs.DeleteKey(CIGlobalKey);
-	            }
-	        }
 
 	        if (GUILayout.Button("Delete All"))
 	        {
-	            if (EditorPrefs.HasKey(CIEnabledKey))
-	            {
-	                EditorPrefs.DeleteKey(CIEnabledKey);
-	            }
 	            if (EditorPrefs.HasKey(AREnabledKey))
 	            {
 	                EditorPrefs.DeleteKey(AREnabledKey);
@@ -95,16 +76,53 @@ namespace Praecipua.EE
 	            {
 	                EditorPrefs.DeleteKey(CIOffsetKey);
 	            }
-	            if (EditorPrefs.HasKey(CIOffsetKey))
-	            {
-	                EditorPrefs.DeleteKey(CIOffsetKey);
-	            }
-	            if (EditorPrefs.HasKey(CIGlobalKey))
-	            {
-	                EditorPrefs.DeleteKey(CIGlobalKey);
-	            }
 	        }
 	        EditorGUILayout.Space();
+		
+		// Hierarchy Custom Icon
+			EditorGUILayout.LabelField("Hierarchy Custom Icon が使用するキー");
+			string HCICenterKey = "Hierarchy_Custom_Icon_Center";
+			string HCIOffsetKey = "Hierarchy_Custom_Icon_Offset";
+
+			if (GUILayout.Button("Delete " + HCICenterKey))
+	        {
+	            if (EditorPrefs.HasKey(HCICenterKey))
+	            {
+	                EditorPrefs.DeleteKey(HCICenterKey);
+	            }
+	        }
+			if (GUILayout.Button("Delete " + HCIOffsetKey))
+	        {
+	            if (EditorPrefs.HasKey(HCIOffsetKey))
+	            {
+	                EditorPrefs.DeleteKey(HCIOffsetKey);
+	            }
+	        }
+
+			if (GUILayout.Button("Delete All"))
+	        {
+	            if (EditorPrefs.HasKey(HCICenterKey))
+	            {
+	                EditorPrefs.DeleteKey(HCICenterKey);
+	            }
+	            if (EditorPrefs.HasKey(HCIOffsetKey))
+	            {
+	                EditorPrefs.DeleteKey(HCIOffsetKey);
+	            }
+	        }
+			EditorGUILayout.Space();
+
+		// Hierarchy Object Active
+			EditorGUILayout.LabelField("Hierarchy Object Active が使用するキー");
+			string HOAOffsetKey = "Hierarchy_Object_Icon_Offset";
+			if (GUILayout.Button("Delete " + HOAOffsetKey))
+	        {
+	            if (EditorPrefs.HasKey(HOAOffsetKey))
+	            {
+	                EditorPrefs.DeleteKey(HOAOffsetKey);
+	            }
+	        }
+			EditorGUILayout.Space();
 
 	    // Row Color
 	        EditorGUILayout.LabelField("Row Color が使用するキー");
@@ -223,7 +241,6 @@ namespace Praecipua.EE
 	                EditorPrefs.DeleteKey(ForceEnglishKey);
 	            }
 	        }
-	        EditorGUILayout.Space();
 	        EditorGUILayout.Space();
 
 	    // ユーザーが個別に削除するキーを指定

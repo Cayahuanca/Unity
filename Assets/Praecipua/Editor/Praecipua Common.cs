@@ -42,7 +42,11 @@ namespace Praecipua.EE
             }
 
             EditorGUILayout.LabelField(CurrentEEXLanguageText);
-            ForceEnglish = EditorGUILayout.Toggle(ForceEnglishText, ForceEnglish);
+
+            EditorGUILayout.BeginHorizontal();
+                ForceEnglish = EditorGUILayout.Toggle(ForceEnglish, GUILayout.Width(30));
+                EditorGUILayout.LabelField(ForceEnglishText, GUILayout.ExpandWidth(true));
+            EditorGUILayout.EndHorizontal();
 
             SaveSettings();
         }

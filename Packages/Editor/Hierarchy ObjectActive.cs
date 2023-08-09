@@ -117,8 +117,15 @@ namespace Praecipua.EE
 	                LoadGlobalText = "他のプロジェクトと共通の設定ファイルから読み込む";
 	            }
 	            
-	            HOAEnabled = EditorGUILayout.Toggle(HOAEnableText, HOAEnabled);
-	            HOAOffset = EditorGUILayout.IntField(HOAOffsetText, HOAOffset);
+				EditorGUILayout.BeginHorizontal();
+	            	HOAEnabled = EditorGUILayout.Toggle(HOAEnabled, GUILayout.Width(30));
+					EditorGUILayout.LabelField(HOAEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
+				
+				EditorGUILayout.BeginHorizontal();
+	            	HOAOffset = EditorGUILayout.IntField(HOAOffset, GUILayout.Width(30));
+					EditorGUILayout.LabelField(HOAOffsetText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 	
 	            if (GUILayout.Button(SaveGlobalText))
 	            {

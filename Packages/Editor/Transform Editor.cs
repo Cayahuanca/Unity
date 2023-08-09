@@ -199,7 +199,10 @@ namespace Praecipua.EE
 	                TEEnableText = "Transform Editor を有効にする";
 	            }
 
-	            TEEnabled = EditorGUILayout.Toggle(TEEnableText, TEEnabled);
+				EditorGUILayout.BeginHorizontal();
+	            	TEEnabled = EditorGUILayout.Toggle(TEEnabled, GUILayout.Width(30));
+					EditorGUILayout.LabelField(TEEnableText, GUILayout.ExpandWidth(true));
+				EditorGUILayout.EndHorizontal();
 
 	            SaveSettings();
 	        }
