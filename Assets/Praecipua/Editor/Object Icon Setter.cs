@@ -65,14 +65,14 @@ namespace Praecipua.EE
 	    private void OnGUI()
 	    {
 	        LoadSettings();
-	    
+
 	        string SelectIconText = "Select the icon you want to use";
 	        string DeselectIconText = "Deselect Icon";
 	        string SelectObjectText = "Select the object you want to apply the icon to";
 	        string ObjectCountText = "Number of objects";
 	        string ResetText = "Deselect Objects";
 	        string ApplyText = "Apply Icon";
-	        string ExportBuiltInIconsText = "Export Built-in Icons (Generate about 1500 icon files). It needs some times.";
+	        string ExportBuiltInIconsText = "Export Built-in Icons (Generate about 1000 icon files). It needs some times.";
 
 	        string folderPath = "Assets/Praecipua/Icons";
 
@@ -87,14 +87,14 @@ namespace Praecipua.EE
 	            ObjectCountText = "アイコンを適用するオブジェクトの数";
 	            ResetText = "オブジェクトの選択を解除";
 	            ApplyText = "適用";
-	            ExportBuiltInIconsText = "ビルトインアイコン(約1500枚)を書き出す 少し時間がかかります";
+	            ExportBuiltInIconsText = "ビルトインアイコン(約1000枚)を書き出す 少し時間がかかります";
 	        }
 
 	        GUILayout.Label(SelectIconText, EditorStyles.boldLabel);
 
 	        string[] IconModeText = { "All Icons", "Builtin Icon", "Folder 1", "Folder 2", "Folder 3" };
 	        IconMode = GUILayout.SelectionGrid(IconMode, IconModeText,  5);
-	    
+
 	        if(IconMode == 1)
 	        {
 	            if (GUILayout.Button(ExportBuiltInIconsText))
@@ -103,7 +103,7 @@ namespace Praecipua.EE
 	                WriteIcon2();
 	            }
 	        }
-	    
+
 	        Texture2D[] icons = new Texture2D[0];
 	        if(IconMode == 0)
 	        {
@@ -120,26 +120,16 @@ namespace Praecipua.EE
 
 	        else if(IconMode == 1)
 	        {
-	            string[] iconFolders = { "Assets/Praecipua/Icons/Unity", "Assets/Praecipua/UnityIcons/1", "Assets/Praecipua/UnityIcons/2" };
-	            foreach (string iconFolders1 in iconFolders)
-	            {
-	                if (!Directory.Exists(iconFolders1))
-	                {
-	                    Directory.CreateDirectory(iconFolders1);
-	                    AssetDatabase.Refresh();
-	                }
-	            }
-	            List<string> iconsPathsList = new List<string>();
+				OldDirMigrate();
 
-	            foreach (string iconFolder in iconFolders)
+				folderPath = "Assets/Praecipua/Icons/Unity";
+	            if (!Directory.Exists(folderPath))
 	            {
-	                string[] paths = AssetDatabase.FindAssets("t:Texture2D", new[] {iconFolder})
-	                                            .Select(AssetDatabase.GUIDToAssetPath)
-	                                            .ToArray();
-	                iconsPathsList.AddRange(paths);
+	                Directory.CreateDirectory(folderPath);
+	                AssetDatabase.Refresh();
 	            }
-
-	            string[] iconsPaths = iconsPathsList.ToArray();
+	            string[] iconsPaths = AssetDatabase.FindAssets("t:Texture2D", new[] {folderPath})
+	                                                .Select(AssetDatabase.GUIDToAssetPath).ToArray();
 	            icons = iconsPaths.Select(AssetDatabase.LoadAssetAtPath<Texture2D>).ToArray();
 			}
 
@@ -260,7 +250,7 @@ namespace Praecipua.EE
 	            targetObjects[i] = (GameObject)EditorGUILayout.ObjectField(targetObjects[i], typeof(GameObject), true);
 	        }
 	        EditorGUILayout.EndScrollView();
-	        
+
 	        if (GUILayout.Button(ResetText))
 	        {
 	            targetObjects = new GameObject[1];
@@ -326,7 +316,7 @@ namespace Praecipua.EE
 	        {
 	            Directory.CreateDirectory(folderPath);
 	        }
-	        
+
 	        Dictionary<string, bool> foldouts = new Dictionary<string, bool>();
 	        // アイコンを取得
 	        Texture2D[] icons;
@@ -417,6 +407,61 @@ namespace Praecipua.EE
 	        Debug.Log("All icons have been exported successfully.");
 	    }
 
+		private static void OldDirMigrate()
+		{
+			string oldFolder1 = "Assets/Praecipua/UnityIcons/1";
+        	string oldFolder2 = "Assets/Praecipua/UnityIcons/2";
+        	string newFolder = "Assets/Praecipua/Icons/Unity";
+
+			if (!Directory.Exists(newFolder))
+	        {
+	            Directory.CreateDirectory(newFolder);
+	        }
+
+			if (Directory.Exists(oldFolder1))
+	        {
+            	string[] files1 = Directory.GetFiles(oldFolder1);
+        	    if (files1.Length > 0)
+    	        {
+	                foreach (string file in files1)
+                	{
+            	        string fileName = Path.GetFileName(file);
+        	            string destinationPath = Path.Combine(newFolder, fileName);
+    	                File.Move(file, destinationPath);
+	                }
+            	    Directory.Delete(oldFolder1, true);
+					File.Delete(oldFolder1 + ".meta");
+
+					AssetDatabase.Refresh();
+    	        }
+	        }
+
+        	if (Directory.Exists(oldFolder2))
+    	    {
+	            string[] files2 = Directory.GetFiles(oldFolder2);
+            	if (files2.Length > 0)
+        	    {
+    	            foreach (string file in files2)
+	                {
+                    	string fileName = Path.GetFileName(file);
+                	    string destinationPath = Path.Combine(newFolder, fileName);
+            	        File.Move(file, destinationPath);
+        	        }
+	                Directory.Delete(oldFolder2, true);
+					File.Delete(oldFolder2 + ".meta");
+
+					AssetDatabase.Refresh();
+            	}
+        	}
+
+			if (Directory.Exists("Assets/Praecipua/UnityIcons") && Directory.GetFiles("Assets/Praecipua/UnityIcons").Length == 0)
+			{
+				Directory.Delete("Assets/Praecipua/UnityIcons", true);
+				File.Delete("Assets/Praecipua/UnityIcons.meta");
+
+				AssetDatabase.Refresh();
+			}
+		}
 	    private static void LoadSettings()
 	    {
 	        ForceEnglish = EditorPrefs.GetBool("Praecipua_English");
