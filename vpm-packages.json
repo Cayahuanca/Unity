@@ -159,6 +159,24 @@
                         "Assets\\Praecipua\\Editor" : "de3854ab00c4cd941a43418ac0a55b27",
                         "Assets\\Praecipua\\Runtime" : "dee224ea480995143b5575f892feb2e6"
                     }
+                },
+                "6.3.0": {
+                    "name": "org.praecipua.ee",
+                    "version": "6.3.0",
+                    "displayName": "Praecipua Editor Enhancer",
+                    "description": "Editor Extension Package",
+                    "author": {
+                        "name": "Praecipua"
+                    },
+                    "unity": "2019.4",
+                    "license": "Apache-2.0",
+                    "keywords": ["extension", "praecipua"],
+                    "url" : "https://github.com/Cayahuanca/Unity/releases/download/6.3.0/org.praecipua.ee-6.3.0.zip?",
+                    "repo" : "https://raw.githubusercontent.com/Cayahuanca/Unity/main/vpm-packages.json",
+                    "legacyFolders" : {
+                        "Assets\\Praecipua\\Editor" : "de3854ab00c4cd941a43418ac0a55b27",
+                        "Assets\\Praecipua\\Runtime" : "dee224ea480995143b5575f892feb2e6"
+                    }
                 }
             }
         }
