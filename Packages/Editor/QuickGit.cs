@@ -167,13 +167,41 @@ namespace Praecipua.EE
 
         public override void OnGUI(string searchContext)
         {
-            //Language
             CultureInfo ci = CultureInfo.InstalledUICulture;
             string lang = ci.Name;
 
+            string SetupGitButtonText = "Setup Git to this project";
+            string CommitButtonText = "Commit Changes";
+            string CommitText = "Commit";
+            string CurrentRemoteText = "Current Target Remote Repository: ";
+            string RemotePushButtonText = "Push Changes to Remote Repository";
+            string RemotePullButtonText = "Pull Changes from Remote Repository";
+            string RemoteNotSetText = "Remote Repository is not set.";
+            string RemoteSetText = "Set Remote Repository";
+            string RemoteSetButtonText = "Add / Change Remote Repository";
+            string RemoteURLNotSetText = "Remote Repository URL is not set.";
+            string GitLogText = "Git Command Log";
+            string GitLogButtonText = "Show Log to Console";
+
+            if (ForceEnglish == false && lang == "ja-JP")
+            {
+                SetupGitButtonText = "Gitをプロジェクトにセットアップ";
+                CommitButtonText = "変更をコミット";
+                CommitText = "コミット";
+                CurrentRemoteText = "現在のリモートリポジトリ: ";
+                RemotePushButtonText = "リモートリポジトリに変更を送信";
+                RemotePullButtonText = "リモートリポジトリの変更を取得";
+                RemoteNotSetText = "リモートリポジトリが設定されていません。";
+                RemoteSetText = "リモートリポジトリの設定";
+                RemoteSetButtonText = "リモートリポジトリを追加(変更)";
+                RemoteURLNotSetText = "リモートリポジトリのURLが設定されていません。";
+                GitLogText = "Gitコマンドのログ";
+                GitLogButtonText = "ログをコンソールに表示";
+            }
+
             if (GitInitialized == false)
             {
-                 if (GUILayout.Button("Gitをセットアップ"))
+                 if (GUILayout.Button(SetupGitButtonText))
                 {
                     SetupGit();
                     GitInitialized = true;
@@ -183,9 +211,9 @@ namespace Praecipua.EE
             if (GitInitialized == true)
             {
 
-                GUILayout.Label("変更をコミット");
+                GUILayout.Label(CommitButtonText);
                 commitMessage = GUILayout.TextField(commitMessage);
-                if (GUILayout.Button("コミット"))
+                if (GUILayout.Button(CommitText))
                 {
                     RunGitCommand("add", "-A");
 
@@ -200,14 +228,14 @@ namespace Praecipua.EE
 
                 if (!string.IsNullOrEmpty(remoteRepositoryName))
                 {
-                    GUILayout.Label("Current Target Remote Repository: " + remoteRepositoryName + "/" + remoteRepositoryBranch);
+                    GUILayout.Label(CurrentRemoteText + remoteRepositoryName + "/" + remoteRepositoryBranch);
 
-                    if (GUILayout.Button("リモートリポジトリに変更を送信"))
+                    if (GUILayout.Button(RemotePushButtonText))
                     {
                         RunGitCommand("push", remoteRepositoryName + " " + remoteRepositoryBranch);
                     }
 
-                    if (GUILayout.Button("リモートリポジトリの変更を取得"))
+                    if (GUILayout.Button(RemotePullButtonText))
                     {
                         RunGitCommand("pull", remoteRepositoryName + " " + remoteRepositoryBranch);
                     }
@@ -215,12 +243,12 @@ namespace Praecipua.EE
                 }
                 else
                 {
-                    GUILayout.Label("リモートリポジトリが設定されていません");
+                    GUILayout.Label(CurrentRemoteText + RemoteNotSetText);
                 }
 
                 GUILayout.Space(10);
 
-                GUILayout.Label("リモートリポジトリの設定");
+                GUILayout.Label(RemoteSetText);
                 GUILayout.BeginHorizontal();
                     GUILayout.Label("Name", GUILayout.Width(40));
                     remoteRepositoryNewName = GUILayout.TextField(remoteRepositoryNewName);
@@ -229,7 +257,7 @@ namespace Praecipua.EE
                     GUILayout.Label("URL", GUILayout.Width(40));
                     remoteRepositoryUrl = GUILayout.TextField(remoteRepositoryUrl);
                 GUILayout.EndHorizontal();
-                if (GUILayout.Button("リモートリポジトリを追加"))
+                if (GUILayout.Button(RemoteSetButtonText))
                 {
                     if (remoteRepositoryNewName == "")
                     {
@@ -238,7 +266,7 @@ namespace Praecipua.EE
                     }
                     if (remoteRepositoryUrl == "")
                     {
-                        UnityEngine.Debug.Log("リモートリポジトリのURLを入力してください");
+                        UnityEngine.Debug.Log(RemoteURLNotSetText);
                         return;
                     }
                     if (remoteRepositoryNewName == remoteRepositoryName)
@@ -254,8 +282,8 @@ namespace Praecipua.EE
 
                 GUILayout.Space(10);
 
-                GUILayout.Label("Gitコマンドのログ");
-                if (GUILayout.Button("ログを表示"))
+                GUILayout.Label(GitLogText);
+                if (GUILayout.Button(GitLogButtonText))
                 {
                     RunGitCommand("log", "-n 5");
                 }
@@ -264,6 +292,18 @@ namespace Praecipua.EE
 
         static void SetupGit()
         {
+            CultureInfo ci = CultureInfo.InstalledUICulture;
+            string lang = ci.Name;
+
+            string GitInitializedText = "Git is initialized to this project.";
+            string GitIgnoreDownloadedText = ".gitignore template file is downloaded.";
+            string GitAlreadyInitializedText = "Git is already initialized to this project.";
+            if (ForceEnglish == false && lang == "ja-JP")
+            {
+                GitInitializedText = "Gitがプロジェクトにセットアップされました。";
+                GitIgnoreDownloadedText = ".gitignore のテンプレートファイルをダウンロードしました。";
+                GitAlreadyInitializedText = "Git はすでにこのプロジェクトにセットアップされています。";
+            }
             // Gitがすでにセットアップされているかどうかを確認
             if (!Directory.Exists(projectPath + ".git"))
             {
@@ -273,16 +313,16 @@ namespace Praecipua.EE
                 // .gitignoreファイルをダウンロードして設置
                 DownloadGitIgnore();
 
-                UnityEngine.Debug.Log("Git is initialized.");
+                UnityEngine.Debug.Log(GitInitializedText);
             }
             else if (!File.Exists(projectPath + ".gitignore"))
             {
                 DownloadGitIgnore();
-                UnityEngine.Debug.Log(".gitignore file is downloaded.");
+                UnityEngine.Debug.Log(GitIgnoreDownloadedText);
             }
             else
             {
-                UnityEngine.Debug.Log("Git is already initialized.");
+                UnityEngine.Debug.Log(GitAlreadyInitializedText);
             }
         }
 
