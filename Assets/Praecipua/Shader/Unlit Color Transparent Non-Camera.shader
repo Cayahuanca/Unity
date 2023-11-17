@@ -3,94 +3,82 @@
 //
 // Instead of attaching license.txt, put the same license text at the bottom of this file.
 
-Shader "Praecipua/FaceCamera/FaceCamera Unlit"
+// A variation of the Unlit/Color shader that supports transparency and does not appear on VRChat camera and mirror.
+
+// Unlit shader. Simplest possible colored, alpha-blended shader.
+// - no lighting
+// - no lightmap support
+// - no texture
+
+Shader "Praecipua/Unlit/Color Transparent Non-Camera"
 {
     Properties
     {
-        _MainTex("Render Texture", 2D) = "white" {}
-        _Alpha ("Alpha", Range(0,1)) = 0.8
+        _Color ("Color", Color) = (1,1,1,1)
     }
 
     SubShader
     {
         Tags
         {
-            "Queue" = "Transparent"
-            "IgnoreProjector" = "True"
-            "RenderType" = "Transparent"
-            "ForceNoShadowCasting" = "True"
+            "Queue"="Transparent"
+            "IgnoreProjector"="True"
+            "RenderType"="Transparent"
         }
         LOD 100
 
-        Zwrite Off
-        ZTest Always
+        ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
-
-        Pass
-        {
-            ColorMask 0
-        }
 
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 2.0
+            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
-            sampler2D   _MainTex;
-            float4      _MainTex_ST;
-            float       _Alpha;
+            fixed4 _Color;
 
             float _VRChatCameraMode;
             float _VRChatMirrorMode;
 
-            struct appdata
+            struct appdata_t
             {
                 float4 vertex : POSITION;
-                float2 texcoord : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
             {
                 float4 vertex : SV_POSITION;
-                float2 texcoord : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            v2f vert(appdata v)
+            v2f vert (appdata_t v)
             {
                 v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+                UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
 
-            uint isPlayerSelf()
-            {
-                float4 output = tex2D(_MainTex, float2(0.5, 0.5));
-                // 0.5, 0.5 は、テクスチャの中心を表す。
-                return output.a == 0 ? 0 : 1;
-                // テクスチャの中心のアルファ値が 0 なら 0 を返す。そうでなければ 1 を返す。
-            }
-
-            fixed4 frag(v2f i) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
                 if(_VRChatCameraMode !=0 || _VRChatMirrorMode != 0)
                 {
                     discard;
                 }
 
-                if(isPlayerSelf() == 0)
-                {
-                    discard;
-                }
-
-                fixed4 output = tex2D(_MainTex, i.texcoord);
-                output.a = output.a * _Alpha;
-                return output;
+                fixed4 col = _Color;
+                UNITY_APPLY_FOG(i.fogCoord, col);
+                return col;
             }
-
             ENDCG
         }
     }

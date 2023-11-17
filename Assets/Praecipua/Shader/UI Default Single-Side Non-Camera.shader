@@ -1,4 +1,9 @@
-// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
+// Unity built-in shader source.
+// Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
+//
+// Instead of attaching license.txt, put the same license text at the bottom of this file.
+
+// A variation of the UI/Default shader that draws only on one side and does not appear on VRChat camera and mirror.
 
 Shader "Praecipua/UI/Default Single-Side Non-Camera"
 {
@@ -40,15 +45,16 @@ Shader "Praecipua/UI/Default Single-Side Non-Camera"
 
         Cull Back
         Lighting Off
-        ZWrite On
-        ZTest LEqual
+        ZWrite Off
+        ZTest [unity_GUIZTestMode]
         Blend SrcAlpha OneMinusSrcAlpha
         ColorMask [_ColorMask]
 
         Pass
         {
             Name "Default"
-        CGPROGRAM
+
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 2.0
@@ -84,39 +90,9 @@ Shader "Praecipua/UI/Default Single-Side Non-Camera"
             float4 _MainTex_ST;
             float _UIMaskSoftnessX;
             float _UIMaskSoftnessY;
-            
-            bool IsHD()
-            {
-                return (_ScreenParams.x == 1280 && _ScreenParams.y == 720);
-            }
-            bool IsFHD()
-            {
-                return (_ScreenParams.x == 1920 && _ScreenParams.y == 1080);
-            }
-            bool IsQHD()
-            {
-                return (_ScreenParams.x == 2560 && _ScreenParams.y == 1440);
-            }
-            bool Is4K()
-            {
-                return (_ScreenParams.x == 3840 && _ScreenParams.y == 2160);
-            }
-            bool Is8K()
-            {
-                return (_ScreenParams.x == 7680 && _ScreenParams.y == 4320);
-            }
-            bool Is16K()
-            {
-                return (_ScreenParams.x == 15360 && _ScreenParams.y == 8640);
-            }
 
-            bool IsVRCMirror()
-            {
-                return unity_CameraProjection[2][0] != 0.f || unity_CameraProjection[2][1] != 0.f;
-            }
-            bool Not(bool n) {
-			    return !n;
-		    }
+            float _VRChatCameraMode;
+            float _VRChatMirrorMode;
 
             v2f vert(appdata_t v)
             {
@@ -132,7 +108,6 @@ Shader "Praecipua/UI/Default Single-Side Non-Camera"
 
                 float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
                 float2 maskUV = (v.vertex.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
-                OUT.vertex.xyz *= Not(IsFHD()) * Not(IsQHD()) * Not(Is4K())* Not(Is8K()) * Not(Is16K()) * Not(IsVRCMirror());
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord.xy, _MainTex);
                 OUT.mask = float4(v.vertex.xy * 2 - clampedRect.xy - clampedRect.zw, 0.25 / (0.25 * half2(_UIMaskSoftnessX, _UIMaskSoftnessY) + abs(pixelSize.xy)));
 
@@ -142,6 +117,11 @@ Shader "Praecipua/UI/Default Single-Side Non-Camera"
 
             fixed4 frag(v2f IN) : SV_Target
             {
+                if(_VRChatCameraMode !=0 || _VRChatMirrorMode != 0)
+                {
+                    discard;
+                }
+
                 half4 color = IN.color * (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd);
 
                 #ifdef UNITY_UI_CLIP_RECT
@@ -159,3 +139,24 @@ Shader "Praecipua/UI/Default Single-Side Non-Camera"
         }
     }
 }
+
+
+// MIT License
+// Copyright (c) 2016 Unity Technologies
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
