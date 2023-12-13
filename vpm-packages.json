@@ -243,7 +243,7 @@
                     "unity": "2019.4",
                     "license": "Apache-2.0",
                     "keywords": ["extension", "praecipua"],
-                    "url" : "https://github.com/Cayahuanca/Unity/releases/download/7.0.0-beta.3/org.praecipua.ee-7.0.0-beta.4.zip?",
+                    "url" : "https://github.com/Cayahuanca/Unity/releases/download/7.0.0-beta.4/org.praecipua.ee-7.0.0-beta.4.zip?",
                     "repo" : "https://raw.githubusercontent.com/Cayahuanca/Unity/main/vpm-packages.json",
                     "legacyFolders" : {
                         "Assets\\Praecipua\\Editor" : "de3854ab00c4cd941a43418ac0a55b27",
