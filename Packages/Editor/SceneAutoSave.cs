@@ -35,6 +35,7 @@ namespace Praecipua.EE
         private const string NotificationOffsetKey = "SceneAutoSave_NotificationOffset";
 
         private static string NotSaveInPlayModeText = "Scene is not automatically saved while in play mode.";
+        private static string NotSaveInBusyText = "Scene Auto Save is skipped because Unity Editor is busy.";
         private static string NotSavedYetText = "Scene is not saved yet. Please save scene manually first to run auto save.";
         private static string SceneSaveSkippedText = "Scene Auto Save Skipped";
         private static string SceneSaveFailedText = "Scene Auto Save Failed";
@@ -60,6 +61,11 @@ namespace Praecipua.EE
 
         private static void OnUpdate()
         {
+            // シーンの自動保存が無効の場合は、処理を行わない
+            if (!saveEnabled)
+            {
+                return;
+            }
             // シーンを自動保存するためのカウンターを更新
             if (saveInterval > EditorApplication.timeSinceStartup - lastNotificationTime && EditorApplication.timeSinceStartup - lastNotificationTime >= saveInterval - notificationOffset && !alreadyNotified)
             {
@@ -100,6 +106,13 @@ namespace Praecipua.EE
                     return;
                 }
 
+                // Unity エディタがビジー状態の場合は、保存しない
+                if (EditorApplication.isUpdating || EditorApplication.isCompiling)
+                {
+                    Debug.Log(NotSaveInBusyText);
+                    return;
+                }
+
                 // Play モード中は、保存しない
                 if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPlaying)
                 {
@@ -135,9 +148,19 @@ namespace Praecipua.EE
         {
             EditorApplication.delayCall += () =>
             {
+                // Unity エディタがビジー状態の場合は、保存しない
+                if (EditorApplication.isUpdating || EditorApplication.isCompiling)
+                {
+                    Debug.Log(NotSaveInBusyText);
+                    saveThread = null;
+                    return;
+                }
+
+                // Play モード中は、保存しない
                 if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPlaying)
                 {
                     Debug.Log(NotSaveInPlayModeText);
+                    saveThread = null;
                     return;
                 }
 
@@ -385,6 +408,7 @@ namespace Praecipua.EE
             if (ForceEnglish == false && lang == "ja-JP")
             {
                 NotSaveInPlayModeText = "プレイモード中は、シーンの自動保存は行われません。";
+                NotSaveInBusyText = "Unity エディタがビジー状態のため、シーンの自動保存は行われません。";
                 NotSavedYetText = "シーンが一度も保存されたことがいない場合は、シーンの自動保存は行われません。";
                 SceneSaveSkippedText = "シーンの自動保存をスキップしました";
                 SceneSaveFailedText = "シーンの自動保存に失敗しました";
