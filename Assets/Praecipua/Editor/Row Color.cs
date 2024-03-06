@@ -47,8 +47,8 @@ namespace Praecipua.EE
 	    private const string RCP_B = "RowColor_Project_B";
 	    private const string RCP_A = "RowColor_Project_A";
 
-	    private static Color HierarchyColor = new Color( 0, 0, 0, 0.08f );
-	    private static Color ProjectColor = new Color( 0, 0, 0, 0.08f );
+	    private static Color HierarchyColor = new Color( 0, 0, 0, 0.118f );
+	    private static Color ProjectColor = new Color( 0, 0, 0, 0.118f );
 
 	    static RowColor()
 	    {
@@ -69,10 +69,11 @@ namespace Praecipua.EE
 
 			Rect labelRect = rect;
 	        labelRect.x    = 32;
-	        labelRect.xMax = labelRect.xMax + 16;
+	        labelRect.xMax = rect.xMax + 16;
 
 	        EditorGUI.DrawRect( labelRect, HierarchyColor );
 
+			// オブジェクトの名前を表示する
 			if (LTHEnabled)
 			{
 				GameObject obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
@@ -98,7 +99,7 @@ namespace Praecipua.EE
 
 			Rect labelRect = rect;
 	        labelRect.x    = 0;
-	        labelRect.xMax = labelRect.xMax + 16;
+	        labelRect.xMax = rect.xMax + 16;
 
 			if (labelRect.height < 32)
 			{
@@ -132,6 +133,7 @@ namespace Praecipua.EE
 
 	        	EditorGUI.DrawRect( labelRect, ProjectColor );
 
+				// アセットの名前を表示する
 				if (LTPEnabled)
 				{
 					var assetPath = AssetDatabase.GUIDToAssetPath(guid);
