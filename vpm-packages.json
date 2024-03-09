@@ -340,7 +340,7 @@
                         "Assets\\Praecipua\\Runtime" : "dee224ea480995143b5575f892feb2e6"
                     }
                 },
-                "7.0.0-beta9": {
+                "7.0.0-beta.9": {
                     "name": "org.praecipua.ee",
                     "version": "7.0.0-beta.9",
                     "displayName": "Praecipua Editor Enhancer",
