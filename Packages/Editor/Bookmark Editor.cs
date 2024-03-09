@@ -9,6 +9,7 @@ namespace Praecipua.EE
 {
     public class BookmarkEditor : EditorWindow
     {
+        private string extensionVersion = "6.3.50";
         // 両方
         private string jsonFilePath;
         private int editTab = 0;
@@ -24,7 +25,8 @@ namespace Praecipua.EE
         // オブジェクト側
         private GameObject root;
         private List<GameObject> children = new List<GameObject>();
-        private int childCount;
+        private List<GameObject> childrenToAdd = new List<GameObject>();
+        private List<BookmarkDataObjs> notFoundObjsList = new List<BookmarkDataObjs>();
         private int selectionMethod = 0;
 
         [MenuItem("Window/Praecipua/Bookmark Editor")]
@@ -114,7 +116,7 @@ namespace Praecipua.EE
 
             EditorGUILayout.EndHorizontal();
 
-            Rect jsonDropArea = GUILayoutUtility.GetRect(0.0f, 20.0f, GUILayout.ExpandWidth(true));
+            Rect jsonDropArea = GUILayoutUtility.GetRect(0.0f, 40.0f, GUILayout.ExpandWidth(true));
             GUI.Box(jsonDropArea, "JSON File Drag & Drop Area");
 
             EditorGUILayout.LabelField("JSON File Path: " +  jsonFilePath);
@@ -123,7 +125,7 @@ namespace Praecipua.EE
 
             EditorGUILayout.BeginHorizontal();
 
-                EditorGUILayout.LabelField("Select Mode: ");
+                EditorGUILayout.LabelField("Mode");
                 editTab = GUILayout.SelectionGrid(editTab, new string[] { "Edit Bookmark Label", "Edit Bookmarked Objects"}, 2);
 
             EditorGUILayout.EndHorizontal();
@@ -139,8 +141,6 @@ namespace Praecipua.EE
                 {
                     EditorGUILayout.BeginHorizontal();
 
-                        bookmarkIndex = EditorGUILayout.IntField(bookmarkIndex, GUILayout.Width(50), GUILayout.MaxWidth(100));
-
                         if (bookmarkIndices.Count == 0)
                         {
                             EditorGUILayout.LabelField("No bookmarks found.");
@@ -153,9 +153,27 @@ namespace Praecipua.EE
                                 {
                                     bookmarkIndex = index;
                                     ReadBookmarkBooks(jsonFilePath, bookmarkIndex);
+                                    if (root != null)
+                                    {
+                                        children = ReadBookmarkObjects(jsonFilePath, bookmarkIndex, root, selectionMethod);
+                                    }
                                 }
                             }
                         }
+
+                        if (GUILayout.Button("Create New", GUILayout.MaxWidth(100)))
+                        {
+                            if (bookmarkIndices.Count > 0)
+                            {
+                                bookmarkIndex = bookmarkIndices.Max() + 1;
+                            }
+                            else
+                            {
+                                bookmarkIndex = 1;
+                            }
+                        }
+
+                        bookmarkIndex = EditorGUILayout.IntField(bookmarkIndex, GUILayout.MaxWidth(100));
 
                     EditorGUILayout.EndHorizontal();
                 }
@@ -221,12 +239,7 @@ namespace Praecipua.EE
 
                     root = EditorGUILayout.ObjectField("Root Object", root, typeof(GameObject), true) as GameObject;
 
-                    if (GUILayout.Button("Remove", GUILayout.MaxWidth(70)))
-                    {
-                        root = null;
-                    }
-
-                    if (GUILayout.Button("Read Objects", GUILayout.MaxWidth(100)))
+                    if (GUILayout.Button("Load Child Objects", GUILayout.MaxWidth(205)))
                     {
                         if (root != null && !string.IsNullOrEmpty(jsonFilePath))
                         {
@@ -243,43 +256,17 @@ namespace Praecipua.EE
                 EditorGUILayout.Space();
 
                 EditorGUILayout.BeginHorizontal();
+
                     EditorGUILayout.LabelField("Selection Method");
-                    selectionMethod = GUILayout.SelectionGrid(selectionMethod, new string[] { "By Relative Path", "By Instance ID"}, 2);
+                    selectionMethod = GUILayout.Toolbar(selectionMethod, new string[] { "By Relative Path", "By Instance ID", "By Object Name (Not Recommend)" });
+
                 EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.LabelField("Child Objects");
-
-                EditorGUI.indentLevel++;
-
-                if (children.Count > 0)
-                {
-                    for (int i = 0; i < children.Count; i++)
-                    {
-                        EditorGUILayout.BeginHorizontal();
-
-                        children[i] = EditorGUILayout.ObjectField(children[i], typeof(GameObject), true) as GameObject;
-
-                        if (GUILayout.Button("Remove", GUILayout.MaxWidth(70)))
-                        {
-                            children.RemoveAt(i);
-                            i--; // Adjust index after removing element
-                        }
-
-                        EditorGUILayout.EndHorizontal();
-                    }
-                }
-
-                EditorGUI.indentLevel--;
-
-                Rect childObjDropArea = GUILayoutUtility.GetRect(0.0f, 20.0f, GUILayout.ExpandWidth(true));
-
-                GUI.Box(childObjDropArea, "Child Objects Drag & Drop Area (Don't drop root object and prefab that doesn't exist in scene here)");
-
-                EditorGUILayout.Space();
 
                 EditorGUILayout.BeginHorizontal();
 
-                    if (GUILayout.Button("Add Objects to Bookmark"))
+                    EditorGUILayout.LabelField("Registered Child Objects");
+
+                    if (GUILayout.Button("Rewrite All", GUILayout.MaxWidth(100)))
                     {
                         if (root != null && !string.IsNullOrEmpty(jsonFilePath))
                         {
@@ -287,6 +274,7 @@ namespace Praecipua.EE
                             if (success)
                             {
                                 Debug.Log("Objects added to bookmark successfully.");
+                                ReadBookmarkObjects(jsonFilePath, bookmarkIndex, root, selectionMethod);
                             }
                             else
                             {
@@ -299,7 +287,7 @@ namespace Praecipua.EE
                         }
                     }
 
-                    if (GUILayout.Button("Delete Objects from Bookmark"))
+                    if (GUILayout.Button("Delete All", GUILayout.MaxWidth(100)))
                     {
                         if (root != null && !string.IsNullOrEmpty(jsonFilePath))
                         {
@@ -307,6 +295,7 @@ namespace Praecipua.EE
                             if (success)
                             {
                                 Debug.Log("Objects deleted from bookmark successfully.");
+                                ReadBookmarkObjects(jsonFilePath, bookmarkIndex, root, selectionMethod);
                             }
                             else
                             {
@@ -318,8 +307,130 @@ namespace Praecipua.EE
                             Debug.LogError("Root object and JSON file path must be specified.");
                         }
                     }
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUI.indentLevel++;
+
+                if (children.Count > 0)
+                {
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+
+                            children[i] = EditorGUILayout.ObjectField(children[i], typeof(GameObject), true) as GameObject;
+
+                            if (GUILayout.Button("Delete", GUILayout.MaxWidth(70)))
+                            {
+                                List<GameObject> removeChildList = new List<GameObject> { children[i] };
+                                BookmarkRemoveObjects(root, removeChildList, jsonFilePath, bookmarkIndex);
+
+                                children.RemoveAt(i);
+                                i--; // Adjust index after removing element
+                            }
+
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
+                EditorGUI.indentLevel--;
+
+                if (notFoundObjsList.Count > 0)
+                {
+
+                    EditorGUILayout.Space();
+
+                    EditorGUILayout.BeginHorizontal();
+
+                        EditorGUILayout.LabelField("Registered but not foud Child Objects");
+
+                        if (GUILayout.Button("Delete All", GUILayout.MaxWidth(100)))
+                        {
+                            List<string> deleteObjectIds = new List<string>();
+                            foreach (var notFoundObj in notFoundObjsList)
+                            {
+                                deleteObjectIds.Add(notFoundObj.bookmarkObjectId);
+                            }
+                            BookmarkRemoveObjectsGuid(deleteObjectIds, jsonFilePath, bookmarkIndex);
+
+                            notFoundObjsList.Clear();
+                        }
+
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUI.indentLevel++;
+
+                    for (int i = 0; i < notFoundObjsList.Count; i++)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+
+                            EditorGUILayout.LabelField(notFoundObjsList[i].objectName);
+                            EditorGUILayout.LabelField(root.name + "/" + notFoundObjsList[i].relativePath);
+                            if (GUILayout.Button("Delete", GUILayout.MaxWidth(70)))
+                            {
+                                List<string> bookmarkObjectIds = new List<string> { notFoundObjsList[i].bookmarkObjectId };
+                                BookmarkRemoveObjectsGuid(bookmarkObjectIds, jsonFilePath, bookmarkIndex);
+
+                                notFoundObjsList.RemoveAt(i);
+                                i--; // Adjust index after removing element
+                            }
+
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                    EditorGUI.indentLevel--;
+                }
+
+                EditorGUILayout.Space();
+
+                EditorGUILayout.BeginHorizontal();
+
+                    EditorGUILayout.LabelField("Add Child Objects");
+
+                    if (GUILayout.Button("Add Objects to Bookmark", GUILayout.MaxWidth(205)))
+                    {
+                        if (root != null && !string.IsNullOrEmpty(jsonFilePath))
+                        {
+                            bool success = BookmarkAddEditObjects(root, childrenToAdd, jsonFilePath, bookmarkIndex);
+                            if (success)
+                            {
+                                Debug.Log("Objects added to bookmark successfully.");
+                                ReadBookmarkObjects(jsonFilePath, bookmarkIndex, root, selectionMethod);
+                            }
+                            else
+                            {
+                                Debug.LogError("Failed to add objects to bookmark.");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError("Root object and JSON file path must be specified.");
+                        }
+                    }
 
                 EditorGUILayout.EndHorizontal();
+
+                EditorGUI.indentLevel++;
+                if (childrenToAdd.Count > 0)
+                {
+                    for (int i = 0; i < childrenToAdd.Count; i++)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+
+                        childrenToAdd[i] = EditorGUILayout.ObjectField(childrenToAdd[i], typeof(GameObject), true) as GameObject;
+
+                        if (GUILayout.Button("Remove", GUILayout.MaxWidth(70)))
+                        {
+                            childrenToAdd.RemoveAt(i);
+                            i--; // Adjust index after removing element
+                        }
+
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
+                EditorGUI.indentLevel--;
+
+                Rect childObjDropArea = GUILayoutUtility.GetRect(0.0f, 40.0f, GUILayout.ExpandWidth(true));
+
+                GUI.Box(childObjDropArea, "Child Objects Drag & Drop Area (Don't drop root object and prefab that doesn't exist in scene)");
 
                 Event evt = Event.current;
                 switch (evt.type)
@@ -340,7 +451,7 @@ namespace Praecipua.EE
 
                                     if (draggedObject != null && !children.Contains(draggedObject))
                                     {
-                                        children.Add(draggedObject);
+                                        childrenToAdd.Add(draggedObject);
                                     }
 
                                 }
@@ -377,9 +488,15 @@ namespace Praecipua.EE
 
         public bool BookmarkAddEditObjects(GameObject root, List<GameObject> children, string jsonFilePath, int bookmarkIndex)
         {
-            if (root == null || string.IsNullOrEmpty(jsonFilePath))
+            if (root == null)
             {
-                Debug.LogError("Root object and JSON file path must be specified.");
+                Debug.LogError("Root object must be specified.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(jsonFilePath))
+            {
+                Debug.LogError("JSON file path must be specified.");
                 return false;
             }
 
@@ -433,33 +550,109 @@ namespace Praecipua.EE
             {
                 if (child != null)
                 {
-                    BookmarkDataObjs existingObj = bookmarkDataObjsList.Find(data => data.relativePath == GetRelativePath(root.transform, child.transform));
-
-                    if (existingObj == null)
+                    switch (selectionMethod)
                     {
-                        // 新しいオブジェクトデータを作成
-                        BookmarkDataObjs bookmarkDataObjs = new BookmarkDataObjs
-                        {
-                            objectId = child.GetInstanceID(),
-                            rootId = root.GetInstanceID(),
-                            relativePath = GetRelativePath(root.transform, child.transform),
-                            objectName = child.name,
-                            bookmarkObjectId = Guid.NewGuid().ToString(),
-                            bookmarkIndices = new List<int>() { bookmarkIndex }
-                        };
-                        bookmarkDataObjsList.Add(bookmarkDataObjs);
-                        bookmarkDataBooks.linkedObjectIds.Add(bookmarkDataObjs.bookmarkObjectId);
-                    }
-                    else
-                    {
-                        if (existingObj.bookmarkIndices.Contains(bookmarkIndex))
-                        {
-                            continue;
-                        }
+                        default:
+                        case 0: // Relative Path
+                        case 3: // Relative Path -> (if not found) -> Instance ID
+                            BookmarkDataObjs existingObjRelative = bookmarkDataObjsList.Find(data => data.relativePath == GetRelativePath(root.transform, child.transform));
+                            if (existingObjRelative == null)
+                            {
+                                // 新しいオブジェクトデータを作成
+                                BookmarkDataObjs bookmarkDataObjs = new BookmarkDataObjs
+                                {
+                                    objectId = child.GetInstanceID(),
+                                    rootId = root.GetInstanceID(),
+                                    relativePath = GetRelativePath(root.transform, child.transform),
+                                    objectName = child.name,
+                                    bookmarkObjectId = Guid.NewGuid().ToString(),
+                                    bookmarkIndices = new List<int>() { bookmarkIndex }
+                                };
+                                bookmarkDataObjsList.Add(bookmarkDataObjs);
+                                bookmarkDataBooks.linkedObjectIds.Add(bookmarkDataObjs.bookmarkObjectId);
+                            }
+                            else
+                            {
+                                // 既存のオブジェクトデータを更新
+                                existingObjRelative.objectId = child.GetInstanceID();
+                                existingObjRelative.rootId = root.GetInstanceID();
 
-                        // 既存のオブジェクトデータにブックマークインデックスを追加
-                        existingObj.bookmarkIndices.Add(bookmarkIndex);
-                        bookmarkDataBooks.linkedObjectIds.Add(existingObj.bookmarkObjectId);
+                                if (existingObjRelative.bookmarkIndices.Contains(bookmarkIndex))
+                                {
+                                    continue;
+                                }
+
+                                existingObjRelative.bookmarkIndices.Add(bookmarkIndex);
+                                bookmarkDataBooks.linkedObjectIds.Add(existingObjRelative.bookmarkObjectId);
+                            }
+                            break;
+                        case 1: // Instance ID
+                        case 4: // Instance ID -> (if not found) -> Object Name
+                            BookmarkDataObjs existingObjInstanceId = bookmarkDataObjsList.Find(data => data.objectId == child.GetInstanceID());
+                            if (existingObjInstanceId == null)
+                            {
+                                // 新しいオブジェクトデータを作成
+                                BookmarkDataObjs bookmarkDataObjs = new BookmarkDataObjs
+                                {
+                                    objectId = child.GetInstanceID(),
+                                    rootId = root.GetInstanceID(),
+                                    relativePath = GetRelativePath(root.transform, child.transform),
+                                    objectName = child.name,
+                                    bookmarkObjectId = Guid.NewGuid().ToString(),
+                                    bookmarkIndices = new List<int>() { bookmarkIndex }
+                                };
+                                bookmarkDataObjsList.Add(bookmarkDataObjs);
+                                bookmarkDataBooks.linkedObjectIds.Add(bookmarkDataObjs.bookmarkObjectId);
+                            }
+                            else
+                            {
+                                // 既存のオブジェクトデータを更新
+                                existingObjInstanceId.rootId = root.GetInstanceID();
+                                existingObjInstanceId.relativePath = GetRelativePath(root.transform, child.transform);
+                                existingObjInstanceId.objectName = child.name;
+
+                                if (existingObjInstanceId.bookmarkIndices.Contains(bookmarkIndex))
+                                {
+                                    continue;
+                                }
+
+                                existingObjInstanceId.bookmarkIndices.Add(bookmarkIndex);
+                                bookmarkDataBooks.linkedObjectIds.Add(existingObjInstanceId.bookmarkObjectId);
+                            }
+                            break;
+                        case 2: // Object Name
+                            BookmarkDataObjs existingObjName = bookmarkDataObjsList.Find(data => data.objectName == child.name);
+                            if (existingObjName == null)
+                            {
+                                // 新しいオブジェクトデータを作成
+                                BookmarkDataObjs bookmarkDataObjs = new BookmarkDataObjs
+                                {
+                                    objectId = child.GetInstanceID(),
+                                    rootId = root.GetInstanceID(),
+                                    relativePath = GetRelativePath(root.transform, child.transform),
+                                    objectName = child.name,
+                                    bookmarkObjectId = Guid.NewGuid().ToString(),
+                                    bookmarkIndices = new List<int>() { bookmarkIndex }
+                                };
+                                bookmarkDataObjsList.Add(bookmarkDataObjs);
+                                bookmarkDataBooks.linkedObjectIds.Add(bookmarkDataObjs.bookmarkObjectId);
+                            }
+                            else
+                            {
+                                // 既存のオブジェクトデータを更新
+                                existingObjName.objectId = child.GetInstanceID();
+                                existingObjName.rootId = root.GetInstanceID();
+                                existingObjName.relativePath = GetRelativePath(root.transform, child.transform);
+
+                                if (existingObjName.bookmarkIndices.Contains(bookmarkIndex))
+                                {
+                                    continue;
+                                }
+
+                                existingObjName.bookmarkIndices.Add(bookmarkIndex);
+                                bookmarkDataBooks.linkedObjectIds.Add(existingObjName.bookmarkObjectId);
+                            }
+                            break;
                     }
                 }
                 else
@@ -474,7 +667,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -493,15 +686,140 @@ namespace Praecipua.EE
 
         public bool BookmarkRemoveObjects(GameObject root, List<GameObject> children, string jsonFilePath, int bookmarkIndex)
         {
-            if (root == null || string.IsNullOrEmpty(jsonFilePath))
+            if (root == null)
             {
-                Debug.LogError("Root object and JSON file path must be specified.");
+                Debug.LogError("Root object must be specified.");
                 return false;
             }
 
-            if (!File.Exists(jsonFilePath))
+            if (string.IsNullOrEmpty(jsonFilePath))
+            {
+                Debug.LogError("JSON file path must be specified.");
+                return false;
+            }
+
+
+            List<BookmarkDataInfos> bookmarkDataInfoList = new List<BookmarkDataInfos>();
+            List<BookmarkDataObjs> bookmarkDataObjsList = new List<BookmarkDataObjs>();
+            List<BookmarkDataBooks> bookmarkDataBooksList = new List<BookmarkDataBooks>();
+            BookmarkFile bookmarkFile = new BookmarkFile();
+
+            // 既存のJsonファイルを読み込み、既存データを保持
+            if (File.Exists(jsonFilePath))
+            {
+                string existingJson = File.ReadAllText(jsonFilePath);
+                BookmarkFile existingBookmarkFile = JsonUtility.FromJson<BookmarkFile>(existingJson);
+                if (existingBookmarkFile.objects != null || existingBookmarkFile.bookmarks != null)
+                {
+                    bookmarkDataObjsList.AddRange(existingBookmarkFile.objects);
+                    bookmarkDataBooksList.AddRange(existingBookmarkFile.bookmarks);
+                }
+                else
+                {
+                    Debug.LogError("Invalid JSON file.");
+                    return false;
+                }
+            }
+            else
             {
                 Debug.LogError("JSON file does not exist.");
+                return false;
+            }
+
+            foreach (GameObject child in children)
+            {
+                if (child != null)
+                {
+                    // 一致するデータを削除
+                    switch (selectionMethod)
+                    {
+                        default:
+                        case 0: // Relative Path
+                        case 3: // Relative Path -> (if not found) -> Instance ID
+                            List<BookmarkDataObjs> matchsRelative = bookmarkDataObjsList.Where(data => data.relativePath == GetRelativePath(root.transform, child.transform) && data.bookmarkIndices.Contains(bookmarkIndex)).ToList();
+                            foreach (var match in matchsRelative)
+                            {
+                                if (match.bookmarkIndices.Count <= 1)
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    bookmarkDataObjsList.Remove(match);
+                                }
+                                else
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    match.bookmarkIndices.Remove(bookmarkIndex);
+                                }
+                            }
+                            break;
+                        case 1: // Instance ID
+                        case 4: // Instance ID -> (if not found) -> Object Name
+                            List<BookmarkDataObjs> matchsInstanceId = bookmarkDataObjsList.Where(data => data.objectId == child.GetInstanceID() && data.bookmarkIndices.Contains(bookmarkIndex)).ToList();
+                            foreach (var match in matchsInstanceId)
+                            {
+                                if (match.bookmarkIndices.Count <= 1)
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    bookmarkDataObjsList.Remove(match);
+                                }
+                                else
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    match.bookmarkIndices.Remove(bookmarkIndex);
+                                }
+                            }
+                            break;
+                        case 2: // Object Name
+                            List<BookmarkDataObjs> matchsObjectName = bookmarkDataObjsList.Where(data => data.objectName == child.name && data.bookmarkIndices.Contains(bookmarkIndex)).ToList();
+                            foreach (var match in matchsObjectName)
+                            {
+                                if (match.bookmarkIndices.Count <= 1)
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    bookmarkDataObjsList.Remove(match);
+                                }
+                                else
+                                {
+                                    bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(match.bookmarkObjectId);
+                                    match.bookmarkIndices.Remove(bookmarkIndex);
+                                }
+                            }
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("GameObjects must be specified.");
+                    return false;
+                }
+            }
+
+            string unityMajorVersion = Application.unityVersion.Split('.')[0];
+
+            BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
+            {
+                unityVersion = int.Parse(unityMajorVersion),
+                extensionVersion = extensionVersion,
+                lastSave = DateTime.Now.ToString()
+            };
+
+            bookmarkDataInfoList.Add(bookmarkDataInfos);
+
+            bookmarkFile.info = bookmarkDataInfoList;
+            bookmarkFile.objects = bookmarkDataObjsList;
+            bookmarkFile.bookmarks = bookmarkDataBooksList;
+
+            string json = JsonUtility.ToJson(bookmarkFile, true);
+            File.WriteAllText(jsonFilePath, json);
+
+            Debug.Log("Objects deleted from bookmark successfully.");
+            return true;
+        }
+
+        public bool BookmarkRemoveObjectsGuid(List<string> bookmarkObjectIds, string jsonFilePath, int bookmarkIndex)
+        {
+            if (string.IsNullOrEmpty(jsonFilePath))
+            {
+                Debug.LogError("JSON file path must be specified.");
                 return false;
             }
 
@@ -532,27 +850,35 @@ namespace Praecipua.EE
                 return false;
             }
 
-            List<BookmarkDataObjs> toBeDeleted = new List<BookmarkDataObjs>(); // 削除対象のリストを作成
-
-            foreach (GameObject child in children)
+            foreach (string bookmarkObjectId in bookmarkObjectIds)
             {
-                if (child != null)
+                if (!string.IsNullOrEmpty(bookmarkObjectId))
                 {
-                    // 一致するデータを削除対象リストに追加
-                    toBeDeleted.AddRange(bookmarkDataObjsList.Where(data => data.relativePath == GetRelativePath(root.transform, child.transform) && data.bookmarkIndices.Contains(bookmarkIndex)));
+                    BookmarkDataObjs toBeDeleted = bookmarkDataObjsList.Find(data => data.bookmarkObjectId == bookmarkObjectId && data.bookmarkIndices.Contains(bookmarkIndex));
+                    if (toBeDeleted != null)
+                    {
+                        if (toBeDeleted.bookmarkIndices.Count <= 1)
+                        {
+                            bookmarkDataObjsList.Remove(toBeDeleted);
+                            bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(bookmarkObjectId);
+                        }
+                        else
+                        {
+                            toBeDeleted.bookmarkIndices.Remove(bookmarkIndex);
+                            bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(bookmarkObjectId);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("There are no objects that match the specified bookmark object ID and bookmark index.");
+                        return false;
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Child object must be specified.");
+                    Debug.LogError("Bookmark object ID must be specified.");
                     return false;
                 }
-            }
-
-            // 削除対象リストに含まれる要素を元のリストから削除
-            foreach (var item in toBeDeleted)
-            {
-                bookmarkDataObjsList.Remove(item);
-                bookmarkDataBooksList.Find(b => b.bookmarkIndex == bookmarkIndex).linkedObjectIds.Remove(item.bookmarkObjectId);
             }
 
             string unityMajorVersion = Application.unityVersion.Split('.')[0];
@@ -560,7 +886,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -659,7 +985,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -740,7 +1066,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -795,7 +1121,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -831,7 +1157,7 @@ namespace Praecipua.EE
             BookmarkDataInfos bookmarkDataInfos = new BookmarkDataInfos
             {
                 unityVersion = int.Parse(unityMajorVersion),
-                extensionVersion = "6.3.50",
+                extensionVersion = extensionVersion,
                 lastSave = DateTime.Now.ToString()
             };
 
@@ -953,25 +1279,86 @@ namespace Praecipua.EE
                 return null;
             }
 
+            notFoundObjsList.Clear();
+
             foreach (var bookmarkDataObjs in bookmarkDataObjsList)
             {
-                if (bookmarkDataObjs.bookmarkIndices.Contains(bookmarkIndex) && bookmarkDataObjs.rootId == root.GetInstanceID())
+                if (bookmarkDataObjs.bookmarkIndices.Contains(bookmarkIndex))
                 {
-                    if (selectionMethod != 1)
+                    switch (selectionMethod)
                     {
-                        Transform child = root.transform.Find(bookmarkDataObjs.relativePath);
-                        if (child != null)
-                        {
-                            bookmarkedObjects.Add(child.gameObject);
-                        }
-                    }
-                    else
-                    {
-                        GameObject obj = EditorUtility.InstanceIDToObject(bookmarkDataObjs.objectId) as GameObject;
-                        if (obj != null)
-                        {
-                            bookmarkedObjects.Add(obj);
-                        }
+                        default:
+                        case 0: // Relative Path
+                            Transform child = root.transform.Find(bookmarkDataObjs.relativePath);
+                            if (child != null)
+                            {
+                                bookmarkedObjects.Add(child.gameObject);
+                            }
+                            else
+                            {
+                                notFoundObjsList.Add(bookmarkDataObjs);
+                            }
+                            break;
+                        case 1: // Instance ID
+                            GameObject obj = EditorUtility.InstanceIDToObject(bookmarkDataObjs.objectId) as GameObject;
+                            if (obj != null)
+                            {
+                                bookmarkedObjects.Add(obj);
+                            }
+                            else
+                            {
+                                notFoundObjsList.Add(bookmarkDataObjs);
+                            }
+                            break;
+                        case 2: // Object Name
+                            Transform child4 = root.transform.Find(bookmarkDataObjs.objectName);
+                            if (child4 != null)
+                            {
+                                bookmarkedObjects.Add(child4.gameObject);
+                            }
+                            else
+                            {
+                                notFoundObjsList.Add(bookmarkDataObjs);
+                            }
+                            break;
+                        case 3: // Relative Path -> (if not found) -> Instance ID
+                            Transform child2 = root.transform.Find(bookmarkDataObjs.relativePath);
+                            if (child2 != null)
+                            {
+                                bookmarkedObjects.Add(child2.gameObject);
+                            }
+                            else
+                            {
+                                GameObject obj2 = EditorUtility.InstanceIDToObject(bookmarkDataObjs.objectId) as GameObject;
+                                if (obj2 != null)
+                                {
+                                    bookmarkedObjects.Add(obj2);
+                                }
+                                else
+                                {
+                                    notFoundObjsList.Add(bookmarkDataObjs);
+                                }
+                            }
+                            break;
+                        case 4: // Instance ID -> (if not found) -> Relative Path
+                            GameObject obj3 = EditorUtility.InstanceIDToObject(bookmarkDataObjs.objectId) as GameObject;
+                            if (obj3 != null)
+                            {
+                                bookmarkedObjects.Add(obj3);
+                            }
+                            else
+                            {
+                                Transform child3 = root.transform.Find(bookmarkDataObjs.relativePath);
+                                if (child3 != null)
+                                {
+                                    bookmarkedObjects.Add(child3.gameObject);
+                                }
+                                else
+                                {
+                                    notFoundObjsList.Add(bookmarkDataObjs);
+                                }
+                            }
+                            break;
                     }
                 }
             }

@@ -56,7 +56,11 @@ namespace Praecipua.EE
                         if (createSuccess )
                         {
                             jsonFilePath = newJsonFilePath;
-                            LoadJson();
+
+                            if (targetObject != null)
+                            {
+                                LoadJson();
+                            }
                         }
                     }
                 }
@@ -73,7 +77,11 @@ namespace Praecipua.EE
                     if (!string.IsNullOrEmpty(newJsonFilePath))
                     {
                         jsonFilePath = newJsonFilePath;
-                        LoadJson();
+
+                        if (targetObject != null)
+                        {
+                            LoadJson();
+                        }
                     }
                 }
 
@@ -88,7 +96,19 @@ namespace Praecipua.EE
 
             EditorGUILayout.Space();
 
-            targetObject = EditorGUILayout.ObjectField("Root Object", targetObject, typeof(GameObject), true) as GameObject;
+            EditorGUILayout.BeginHorizontal();
+
+                targetObject = EditorGUILayout.ObjectField("Root Object", targetObject, typeof(GameObject), true) as GameObject;
+
+                if (GUILayout.Button("Load JSON"))
+                {
+                    if (targetObject != null)
+                    {
+                        LoadJson();
+                    }
+                }
+
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
 
@@ -100,17 +120,12 @@ namespace Praecipua.EE
 
             EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Selection Method");
-                selectionMethod = GUILayout.SelectionGrid(selectionMethod, new string[] { "By Relative Path", "By Instance ID"}, 2);
+                selectionMethod = GUILayout.Toolbar(selectionMethod, new string[] { "By Relative Path", "By Instance ID", "By Object Name (Not Recommend)" });
             EditorGUILayout.EndHorizontal();
-
-            GUILayout.Label("Bookmarks:");
 
             EditorGUILayout.Space();
 
-            GUILayout.Label("Left click to select a bookmark.");
-            GUILayout.Label("Right click to edit a bookmark.");
-            GUILayout.Label("Ctrl + Right click to add a bookmark.");
-            GUILayout.Label("Ctrl + Left click to drag a bookmark.");
+            GUILayout.Label("Left click to select a bookmark. Right click to edit a bookmark. Ctrl + Right click to add a bookmark. Ctrl + Left click to drag a bookmark.");
 
             // ウィンドウの高さと幅が最大値
             Rect bookmarksArea = GUILayoutUtility.GetRect(100, 500, position.width, position.width);
@@ -142,24 +157,11 @@ namespace Praecipua.EE
                 Rect rect = new Rect(xCoordinate, yCoordinate, radius, radius);
                 rect.position += bookmarksArea.position;
 
-                // ラベルの表示設定
-                // if (bookmark.showLabel == 2)
-                // {
-                    GUIContent labelContent = new GUIContent(bookmark.labelText);
-                    GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
-                    labelStyle.normal.textColor = GetContrastColor(bookmark.labelColor);
-                    labelStyle.fontStyle = FontStyle.Bold;
-                    float labelWidth = labelStyle.CalcSize(labelContent).x;
-                    // rect.size = new Vector2(labelWidth + 10f, rect.size.y);
-                    labelStyle.alignment = TextAnchor.MiddleCenter;
-                    // EditorGUI.LabelField(rect, labelContent, labelStyle);
-                // }
-
                 switch (bookmark.labelType)
                 {
                     case 0: // 初期の未指定の場合, 1つのオブジェクトにリンクされている場合は Circle, それ以外は Square
                         rect.size = new Vector2(radius * 2, radius * 2);
-                        if (bookmark.linkedObjectIds.Count == 1)
+                        if (bookmark.linkedObjectIds.Count == 0 || bookmark.linkedObjectIds.Count == 1)
                         {
                             DrawCircle(rect, bookmark.labelColor, radius);
                         }
@@ -217,6 +219,13 @@ namespace Praecipua.EE
                         DrawTriangle(rect, bookmark.labelColor);
                         break;
                     case 13: // Square with Text
+                        GUIContent forcelabelContent = new GUIContent(bookmark.labelText);
+                        GUIStyle forcelabelStyle = new GUIStyle(EditorStyles.label);
+                        forcelabelStyle.normal.textColor = GetContrastColor(bookmark.labelColor);
+                        forcelabelStyle.fontStyle = FontStyle.Bold;
+                        forcelabelStyle.alignment = TextAnchor.MiddleCenter;
+
+                        float labelWidth = forcelabelStyle.CalcSize(forcelabelContent).x;
                         if (labelWidth + 10f > radius * 2)
                         {
                             rect.size = new Vector2(labelWidth + 10f, radius * 2);
@@ -225,8 +234,9 @@ namespace Praecipua.EE
                         {
                             rect.size = new Vector2(radius * 2, radius * 2);
                         }
+
                         EditorGUI.DrawRect(rect, bookmark.labelColor);
-                        EditorGUI.LabelField(rect, labelContent, labelStyle);
+                        EditorGUI.LabelField(rect, forcelabelContent, forcelabelStyle);
                         break;
                     default:
                         rect.size = new Vector2(radius * 2, radius * 2);
@@ -244,9 +254,25 @@ namespace Praecipua.EE
                 // EditorGUI.DrawRect(rect, bookmark.labelColor); // 当たり判定の領域確認
 
                 // ブックマークの選択
-                if (Event.current.isMouse && Event.current.type == EventType.MouseDown)
+                if (rect.Contains(Event.current.mousePosition))
                 {
-                    if (rect.Contains(Event.current.mousePosition))
+                    // ラベルの表示設定
+                    if (bookmark.showLabel == 2 && !string.IsNullOrEmpty(bookmark.labelText) && bookmark.labelType != 13)
+                    {
+                        GUIContent labelContent = new GUIContent(bookmark.labelText);
+                        GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
+                        labelStyle.normal.textColor = GetContrastColor(bookmark.labelColor);
+                        labelStyle.fontStyle = FontStyle.Bold;
+                        labelStyle.alignment = TextAnchor.MiddleCenter;
+
+                        float labelWidth = labelStyle.CalcSize(labelContent).x;
+                        Rect labelRect = new Rect (rect.xMax + 5f, rect.yMax + 5f, labelWidth + 10f, 20f);
+
+                        EditorGUI.DrawRect(labelRect, bookmark.labelColor);
+                        EditorGUI.LabelField(labelRect, labelContent, labelStyle);
+                    }
+
+                    if (Event.current.isMouse && Event.current.type == EventType.MouseDown)
                     {
                         isBookmarkLabelExist = true;
 
@@ -280,7 +306,7 @@ namespace Praecipua.EE
                             }
                         }
                         // 左クリック + Ctrl でドラッグを開始
-                        else if ((Event.current.modifiers & EventModifiers.Control) != 0)
+                        if ((Event.current.modifiers & EventModifiers.Control) != 0)
                         {
                             if (Event.current.button == 0)
                             {
@@ -299,13 +325,8 @@ namespace Praecipua.EE
                     // ブックマークのドラッグ中の処理
                     if (isDragging)
                     {
-                        if (dragEndPos != dragStartPos)
-                        {
-                            isBookmarkLabelExist = false;
-                            isDragging = false;
-                            draggingBookmarkIndex = -1;
-                            continue;
-                        }
+                        isBookmarkLabelExist = false;
+                        isDragging = false;
 
                         if (bookmarksArea.Contains(Event.current.mousePosition))
                         {
@@ -314,6 +335,12 @@ namespace Praecipua.EE
                         else
                         {
                             dragEndPos = dragStartPos;
+                        }
+
+                        if (dragEndPos == dragStartPos)
+                        {
+                            draggingBookmarkIndex = -1;
+                            continue;
                         }
 
                         Vector2 movedPosition = dragEndPos - dragStartPos;
@@ -327,10 +354,10 @@ namespace Praecipua.EE
                         {
                             if (draggingBookmark.bookmarkIndex == draggingBookmarkIndex)
                             {
-                                Debug.Log("Dragged Bookmark labelColor: " + draggingBookmark.labelColor);
-                                Debug.Log("Dragged Bookmark labelText: " + draggingBookmark.labelText);
+                                //Debug.Log("Dragged Bookmark labelColor: " + draggingBookmark.labelColor);
+                                //Debug.Log("Dragged Bookmark labelText: " + draggingBookmark.labelText);
                                 editedBookmark = draggingBookmark;
-                                break; // 目的のブックマークを見つけたらループを終了します
+                                break;
                             }
                         }
                         //Debug.Log(editedBookmark.labelColor + ", " + editedBookmark.labelText + ", " + editedBookmark.labelType + ", " + editedBookmark.showLabel + ", " + editedBookmark.xCoordinate + ", " + editedBookmark.yCoordinate + ", " + editedBookmark.linkedObjectIds.Count);
@@ -342,8 +369,6 @@ namespace Praecipua.EE
                             LoadJson();
                         }
 
-                        isBookmarkLabelExist = false;
-                        isDragging = false;
                         draggingBookmarkIndex = -1;
                     }
                     else
@@ -406,6 +431,7 @@ namespace Praecipua.EE
             {
                 Debug.LogError("Invalid JSON file.");
             }
+
             if (bookmarkFile != null && bookmarkFile.objects != null)
             {
                 bookmarkDataObjsList = bookmarkFile.objects;
@@ -449,13 +475,13 @@ namespace Praecipua.EE
 
             if (bookmarkObjectIds == null || bookmarkObjectIds.Length == 0)
             {
-                Debug.LogWarning("No object IDs provided.");
+                Debug.LogWarning("No object IDs registered.");
                 return;
             }
 
             if (targetObject == null)
             {
-                Debug.LogError("Target object is not specified.");
+                Debug.LogError("Root object is not specified.");
                 return;
             }
 
@@ -478,7 +504,7 @@ namespace Praecipua.EE
                                 currentTransform = currentTransform.Find(pathComponent);
                                 if (currentTransform == null)
                                 {
-                                    Debug.LogWarning("Object not found: " + relativePath + " (Relative Path)");
+                                    Debug.LogWarning("Object not found: " + targetObject.name + "/" + relativePath + " (Relative Path)");
                                     break;
                                 }
                             }
