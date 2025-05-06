@@ -9,10 +9,6 @@ C# Code, Shader, VRChat Items, and more...
 
 Some of them are available on BOOTH. We would appreciate it if you could purchase them as a donation.
 
-一部のものは、BOOTH で販売しています。寄付として購入していただけるとありがたいです。
-
-[Praecipua - BOOTH](https://praecipua.booth.pm/)
-
 Almost of them were made for personal use and has not been verified in other environments.
 
 基本的には、個人用として作ったものであり、動作保証などは致しません。
@@ -22,6 +18,15 @@ Almost of them were made for personal use and has not been verified in other env
 ## 1. Unity Editor Enhancer
  
 ![Editor Enhancer Poster](/Readme/EEXPoster.png)
+
+- Supported Version: 
+  - 2018 (5.x まで。それ以降は一部動かない可能性あり)
+  - 2019 (2019.4.31f1, 2019.4.40f1 と、6.x で動作確認済)
+  - 2021 (6.x のみ動作確認済)
+  - 2022 (2022.3.6f1, 2022.3.22f1 と 6.x, 7.0 で動作確認済)
+  - 6 (6000.0.0b11 と 6.x, 7.0 で動作確認済)
+  - 团结引擎 (Tuanjie 1.5.1 と 7.0 で動作確認済)
+  - ここに記載のないもの (他のマイナーバージョン違いや、中国の f1c1 と付くものなど) は、基本的に動くとは思いますが、実際に使用しての動作確認はしていません。
 
 - within the hierarchy
   - Label with background color
@@ -74,8 +79,6 @@ Almost of them were made for personal use and has not been verified in other env
 
 [Check out this PDF for instructions on how to do it. (Japanese Only)](howtouse.pdf)
 
-[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4523837)
-
 [VRChat Creator Companion Setup](vcc://vpm/addRepo?url=https://raw.githubusercontent.com/Cayahuanca/Unity/main/vpm-packages.json)
 
 ## 2. Face Camera
@@ -87,8 +90,6 @@ It is not visible to others, nor does it appear in his VRCMirror or VRCCamera, w
 これは、VRChat で、自身のアバターの表情を確認するためのシェーダーです。
 
 他人からは見えず、reserved2 をオフにしていない VRCMirror や、VRCCamera にも映りません。
-
-[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4409754)
 
 ![FaceCamera](/Readme/FaceCamera.png)
 
@@ -111,7 +112,5 @@ If an animation is created, it may be possible to link facial expressions.
 頭に仕込むことで、頭から脳みその代わりにメロンパンを引っ張り出すことができます。
 
 アニメーションを作れば、表情を連動させることも可能でしょう。
-
-[Buy a Coffee in BOOTH](https://praecipua.booth.pm/items/4373950)
 
 ![Melon](/Readme/Melon.png)
